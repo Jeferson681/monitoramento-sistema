@@ -1,0 +1,25 @@
+# Arquivos Python compilados
+__pycache__/
+*.pyc
+
+# Ambiente virtual (se estiver usando venv)
+venv/
+ENV/
+*.egg-info/
+
+# Arquivos de configuração sensíveis
+.env
+
+# Logs e temporários
+*.log
+*.tmp
+
+# Diretórios ocultos e de sistema
+.DS_Store
+.idea/
+.vscode/
+
+# Docker
+*.db
+*.sqlite3
+*.pid
