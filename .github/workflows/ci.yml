@@ -6,7 +6,10 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: 📥 Clonar repositório
@@ -19,6 +22,15 @@ jobs:
 
       - name: 📦 Instalar dependências
         run: pip install -r requirements.txt
+
+      - name: 🔧 Ajustar PYTHONPATH
+        if: runner.os == 'Windows'
+        run: echo "PYTHONPATH=${{ github.workspace }}" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      - name: 🔧 Ajustar PYTHONPATH
+        if: runner.os != 'Windows'
+        run: echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
 
       - name: 🧪 Rodar testes com cobertura
         run: pytest --cov=. --cov-report=term-missing -q
