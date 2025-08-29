@@ -1,0 +1,22 @@
+# Ambientes virtuais
+.venv/
+__pycache__/
+*.pyc
+
+# Arquivos de configuração sensíveis
+.env
+config_email.json
+
+# Logs
+*.log
+monitoramento.log
+
+# Arquivos temporários e de sistema
+*.swp
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Testes (se não quiser incluir na imagem final)
+tests/

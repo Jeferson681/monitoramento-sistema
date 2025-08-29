@@ -1,4 +1,4 @@
-from sistema import obter_disco_principal, ler_temperatura
+from core.sistema import obter_disco_principal, ler_temperatura
 import psutil
 
 def metricas():

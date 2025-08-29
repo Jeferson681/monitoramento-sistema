@@ -1,10 +1,11 @@
 import time
-from config import STATUS, parse_args
-from logs import registrar_evento, gerar_log
-from monitor import metricas, formatar_metricas
-from helpers import log_verbose
 
-from sistema import estado_ram_limpa
+from config.status import STATUS,parse_args
+from services.logger import registrar_evento, gerar_log
+from core.monitor import metricas, formatar_metricas
+from services.helpers import log_verbose
+
+from core.sistema import estado_ram_limpa
 
 
 def _eh_memoria(nome):
@@ -22,6 +23,8 @@ def verificar_metricas(args):
     estado_alerta = False
     comp_disparo = None
     valor_disparo = None
+
+    from config.status import STATUS
 
     for nome, valor in dados.items():
         if nome in STATUS and valor is not None:
@@ -46,7 +49,7 @@ def verificar_metricas(args):
     if estado_critico:
         if _eh_memoria(comp_disparo):
             critico_memoria = True
-            lim_comp = STATUS[comp_disparo]
+            lim_comp = STATUS [comp_disparo]
 
             # Tenta corrigir
             novo_valor, restaurado, em_alerta_apos_limpeza = estado_ram_limpa(
@@ -95,7 +98,7 @@ def verificar_metricas(args):
 
     for nome, valor in dados.items():
         if nome in STATUS and valor is not None:
-            lim = STATUS[nome]
+            lim = STATUS [nome]
             if lim["alerta"] <= valor < lim["critico"]:
                 estado_alerta_atual, comp_alerta, valor_alerta = True, nome, valor
                 break

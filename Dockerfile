@@ -6,9 +6,10 @@ WORKDIR /app
 
 # 3. Copiar os arquivos de dependência primeiro
 COPY requirements.txt .
-
-# 4. Instalar dependências
 RUN pip install --no-cache-dir -r requirements.txt
+
+# 4. Instalar pacotes de desenvolvimento
+RUN pip install pytest python-dotenv
 
 # 5. Copiar o restante do projeto
 COPY . .

@@ -1,12 +1,15 @@
-from datetime import datetime
+import datetime
 import os
 import smtplib
+import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import psutil
-import time
-from sistema import limpar_ram_global
-from monitor import metricas
+
+from config.status import STATUS, parse_args
+from core.sistema import limpar_ram_global, estado_ram_limpa
+from core.monitor import metricas, formatar_metricas
+from services.logger import gerar_log, registrar_evento
+
 
 def timestamp(fmt="%Y-%m-%d %H:%M:%S"):
     return datetime.now().strftime(fmt)
@@ -40,14 +43,6 @@ def enviar_email_alerta(mensagem, modo_teste=True):
         print("📨 E-mail enviado com sucesso!")
     except Exception as e:
         print(f"❌ Falha ao enviar e-mail: {e}")
-
-import time
-from datetime import datetime
-from config import STATUS, parse_args
-from logs import registrar_evento, gerar_log
-from monitor import metricas, formatar_metricas
-from utils import log_verbose
-from sistema import estado_ram_limpa  # ajuste se a função estiver em outro módulo
 
 def _eh_memoria(nome):
     return str(nome).lower() in {"memoria", "memória", "ram"}

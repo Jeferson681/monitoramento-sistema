@@ -36,7 +36,7 @@ STATUS = {
     #"ping_latency_ms": {"alerta": 100, "critico": 300}
 }
 
-import argparse
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Monitoramento do sistema")
