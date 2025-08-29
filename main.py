@@ -1,6 +1,6 @@
 import time
 
-from config.status import STATUS,parse_args
+from core.args import parse_args
 from services.logger import registrar_evento, gerar_log
 from core.monitor import metricas, formatar_metricas
 from services.helpers import log_verbose
@@ -24,7 +24,7 @@ def verificar_metricas(args):
     comp_disparo = None
     valor_disparo = None
 
-    from config.status import STATUS
+    from config.settings import STATUS
 
     for nome, valor in dados.items():
         if nome in STATUS and valor is not None:

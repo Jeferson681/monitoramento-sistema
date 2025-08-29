@@ -5,22 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0ad11c40-885f-4dc5-91f9-8c551ee12317" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/config/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/status.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/logger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/monitoramento.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/status.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/sistema.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/sistema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitor.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/monitor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sistema.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/sistema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_sistema.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sistema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_status.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_status.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

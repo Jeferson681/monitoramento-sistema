@@ -55,10 +55,12 @@ def limpar_ram_global():
         print(f"⚠️ Limpeza de RAM não suportada para: {sistema}")
 
 
-def estado_ram_limpa(componente, valor, alerta, critico, metricas_func):
+def estado_ram_limpa(componente, valor, alerta, critico, metricas_func, sleep_seconds=None):
     """Tenta limpar RAM e reavalia estado"""
     limpar_ram_global()
-    time.sleep(30)
+    if sleep_seconds is None:
+        sleep_seconds = int(os.getenv("SLEEP_AFTER_CLEAN", "30"))
+    time.sleep(sleep_seconds)
     novo_valor = metricas_func().get(componente)
     if novo_valor is None:
         return valor, False, False
