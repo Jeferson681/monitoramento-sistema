@@ -1,6 +1,9 @@
 import os
 import tempfile
 
+from services.logger import gerar_log
+
+
 def test_gerar_log_cria_arquivo():
     with tempfile.TemporaryDirectory() as temp_dir:
         os.environ["PASTA_SERVICES"] = temp_dir
