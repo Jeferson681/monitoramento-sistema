@@ -4,7 +4,6 @@ from core.args import parse_args
 from services.logger import registrar_evento, gerar_log
 from core.monitor import metricas, formatar_metricas
 from services.helpers import log_verbose
-
 from core.sistema import estado_ram_limpa
 
 
@@ -13,18 +12,17 @@ def _eh_memoria(nome):
 
 
 def verificar_metricas(args):
+    from config.settings import STATUS
+
     # 📍 Coleta inicial
     dados = metricas()
     snapshot_inicial = formatar_metricas(dados)
     print(snapshot_inicial)
 
-    # 📍 Detecta estado inicial e o componente que disparou
+    # 📍 Detecta estado inicial
     estado_critico = False
-    estado_alerta = False
     comp_disparo = None
     valor_disparo = None
-
-    from config.settings import STATUS
 
     for nome, valor in dados.items():
         if nome in STATUS and valor is not None:
@@ -33,9 +31,8 @@ def verificar_metricas(args):
                 estado_critico, comp_disparo, valor_disparo = True, nome, valor
                 break
             elif lim["alerta"] <= valor < lim["critico"] and not estado_critico:
-                estado_alerta, comp_disparo, valor_disparo = True, nome, valor
+                comp_disparo, valor_disparo = nome, valor
 
-    # Flags para controle de fluxo
     houve_critico = estado_critico
     critico_memoria = False
     restaurado = False
@@ -49,7 +46,7 @@ def verificar_metricas(args):
     if estado_critico:
         if _eh_memoria(comp_disparo):
             critico_memoria = True
-            lim_comp = STATUS [comp_disparo]
+            lim_comp = STATUS[comp_disparo]
 
             # Tenta corrigir
             novo_valor, restaurado, em_alerta_apos_limpeza = estado_ram_limpa(
@@ -59,35 +56,30 @@ def verificar_metricas(args):
             snapshot_pos = formatar_metricas(dados)
             valor_depois = novo_valor
 
-            # Log da ação corretiva
+            # Log da ação corretiva (informativo)
             gerar_log(
                 "acao_limpeza_ram",
                 comp_disparo,
                 valor_antes,
                 valor_depois,
-                f"ANTES:\n{snapshot_inicial}\n---\nDEPOIS:\n{snapshot_pos}\nrestaurado={restaurado}, em_alerta={em_alerta_apos_limpeza}"
+                f"ANTES:\n{snapshot_inicial}\n---\nDEPOIS:\n{snapshot_pos}\n"
+                f"restaurado={restaurado}, em_alerta={em_alerta_apos_limpeza}"
             )
 
             if novo_valor >= lim_comp["critico"]:
-                registrar_evento("alerta_crítico", comp_disparo, valor_antes, novo_valor, args, mensagem_extra=snapshot_pos)
-                gerar_log("alerta_crítico", comp_disparo, valor_antes, novo_valor, snapshot_pos)
+                registrar_evento("alerta_crítico", comp_disparo, valor_antes, novo_valor, args, snapshot_pos)
 
             elif em_alerta_apos_limpeza:
-                gerar_log(
-                    "restaurado_para_alerta",
-                    comp_disparo,
-                    valor_antes,
-                    valor_depois,
+                registrar_evento(
+                    "restaurado_para_alerta", comp_disparo, valor_antes, valor_depois, args,
                     f"Estava em crítico (memória), limpeza feita, permanece em ALERTA.\n{snapshot_pos}"
                 )
 
-            else:  # Restaurado para estável
-                registrar_evento("restaurado", comp_disparo, valor_antes, valor_depois, args, mensagem_extra=snapshot_pos)
-                gerar_log("restaurado", comp_disparo, valor_antes, valor_depois, snapshot_pos)
+            else:
+                registrar_evento("restaurado", comp_disparo, valor_antes, valor_depois, args, snapshot_pos)
 
         else:
-            registrar_evento("alerta_crítico", comp_disparo, valor_disparo, valor_disparo, args, mensagem_extra=snapshot_inicial)
-            gerar_log("alerta_crítico", comp_disparo, valor_disparo, valor_disparo, snapshot_inicial)
+            registrar_evento("alerta_crítico", comp_disparo, valor_disparo, valor_disparo, args, snapshot_inicial)
 
     # ===============================
     # 📍 REAVALIAÇÃO ALERTA ATUAL
@@ -98,7 +90,7 @@ def verificar_metricas(args):
 
     for nome, valor in dados.items():
         if nome in STATUS and valor is not None:
-            lim = STATUS [nome]
+            lim = STATUS[nome]
             if lim["alerta"] <= valor < lim["critico"]:
                 estado_alerta_atual, comp_alerta, valor_alerta = True, nome, valor
                 break
@@ -107,25 +99,22 @@ def verificar_metricas(args):
 
     if estado_alerta_atual:
         if houve_critico and not critico_memoria:
-            pass  # alerta ignorado, já tratado no crítico
+            pass
         elif houve_critico and critico_memoria and restaurado and em_alerta_apos_limpeza:
-            gerar_log(
-                "restaurado_para_alerta",
-                comp_alerta,
+            registrar_evento(
+                "restaurado_para_alerta", comp_alerta,
                 valor_depois if valor_depois is not None else valor_alerta,
-                valor_alerta,
+                valor_alerta, args,
                 f"Tentativa de limpeza → permanece em ALERTA.\n{snapshot_atual}"
             )
         elif not houve_critico:
-            registrar_evento("alerta_atenção", comp_alerta, valor_alerta, valor_alerta, args, mensagem_extra=snapshot_atual)
-            gerar_log("alerta_atenção", comp_alerta, valor_alerta, valor_alerta, snapshot_atual)
+            registrar_evento("alerta_atenção", comp_alerta, valor_alerta, valor_alerta, args, snapshot_atual)
 
     # ===============================
     # 📍 ESTÁVEL
     # ===============================
     if not houve_critico and not estado_alerta_atual:
-        registrar_evento("sistema_estável", "todas", None, None, args, mensagem_extra=snapshot_inicial)
-        gerar_log("sistema_estável", "todas", None, None, snapshot_inicial)
+        registrar_evento("sistema_estável", "todas", None, None, args, snapshot_inicial)
 
 
 def executar(args):
