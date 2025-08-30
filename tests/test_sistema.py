@@ -1,20 +1,38 @@
 import core.sistema
+import platform
+import subprocess
 
-# 🔧 Simula função de métricas com valor seguro após limpeza
-def fake_metricas():
-    return {"memoria_usada": 65.0}
+#  Testa limpeza de RAM simulando ambiente Windows
+def test_limpar_ram_windows(monkeypatch):
+    monkeypatch.setattr(platform, "system", lambda: "Windows")
+    monkeypatch.setattr(core.sistema.ctypes.windll.kernel32, "OpenProcess", lambda *a, **k: 1)
+    monkeypatch.setattr(core.sistema.ctypes.windll.psapi, "EmptyWorkingSet", lambda h: None)
+    monkeypatch.setattr(core.sistema.ctypes.windll.kernel32, "CloseHandle", lambda h: None)
+    monkeypatch.setattr(core.sistema.psutil, "process_iter", lambda attrs: [{"info": {"pid": 1234}}])
+    core.sistema.limpar_ram_global()
 
-# ✅ Testa se a limpeza de RAM restaura o valor para fora do estado crítico
-def test_estado_ram_limpa_restaurado(monkeypatch):
-    # Evita execução real da limpeza
-    monkeypatch.setattr(core.sistema, "limpar_ram_global", lambda: None)
+#  Testa limpeza de RAM simulando ambiente Linux
+def test_limpar_ram_linux(monkeypatch):
+    monkeypatch.setattr(platform, "system", lambda: "Linux")
+    monkeypatch.setattr(core.sistema.os, "system", lambda cmd: None)
+    core.sistema.limpar_ram_global()
 
-    # Executa função com valor inicial crítico (95), limites de alerta (70) e crítico (90)
-    novo_valor, restaurado, em_alerta = core.sistema.estado_ram_limpa(
-        "memoria_usada", 95.0, 70.0, 90.0, fake_metricas, sleep_seconds=0
-    )
+#  Testa leitura de temperatura com saída válida
+def test_ler_temperatura_ok(monkeypatch):
+    class Resultado:
+        returncode = 0
+        stdout = "55"
 
-    # Verifica se o valor foi restaurado com sucesso
-    assert novo_valor < 90.0
-    assert restaurado is True
-    assert em_alerta is False
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: Resultado())
+    temp = core.sistema.ler_temperatura()
+    assert temp == "55°C"
+
+#  Testa leitura de temperatura com falha
+def test_ler_temperatura_falha(monkeypatch):
+    class Resultado:
+        returncode = 1
+        stdout = ""
+
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: Resultado())
+    temp = core.sistema.ler_temperatura()
+    assert temp is None

@@ -1,9 +1,10 @@
-import datetime
 import os
 import smtplib
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+from datetime import datetime
 
 from config.settings import STATUS
 from core.args import parse_args
