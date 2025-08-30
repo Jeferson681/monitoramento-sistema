@@ -20,6 +20,13 @@ def parse_args():
         default=int(os.getenv("LOOP_SECONDS", "30")),  # pode vir do .env
         help="Intervalo em segundos no modo contínuo"
     )
+    # --ciclos: número de execuções antes de encerrar (modo contínuo)
+    parser.add_argument(
+        "--ciclos",
+        type=int,
+        default=None,  # None = infinito
+        help="Número de ciclos no modo contínuo (None = infinito)"
+    )
 
     # --log: define onde os logs vão aparecer (console ou arquivo)
     parser.add_argument(

@@ -15,4 +15,5 @@ RUN pip install pytest python-dotenv
 COPY . .
 
 # 6. Comando padrão
-CMD ["python", "main.py"]
+ENTRYPOINT ["python", "main.py"]
+CMD ["--modo", "contínuo", "--loop", "30"]

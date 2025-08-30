@@ -122,8 +122,12 @@ def executar(args):
     if args.modo == "contínuo":
         log_verbose(f"Iniciando monitoramento com intervalo {args.loop}s", args.verbose)
         try:
+            contador = 0
             while True:
                 verificar_metricas(args)
+                contador += 1
+                if args.ciclos and contador >= args.ciclos:
+                    break
                 time.sleep(args.loop)
         except KeyboardInterrupt:
             print("\n[INFO] Monitoramento interrompido.")
