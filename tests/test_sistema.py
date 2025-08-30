@@ -1,8 +1,11 @@
+import pytest
+
 import core.sistema
 import platform
 import subprocess
 
 #  Testa limpeza de RAM simulando ambiente Windows
+@pytest.mark.skipif(platform.system() != "Windows", reason="Somente para Windows")
 def test_limpar_ram_windows(monkeypatch):
     monkeypatch.setattr(platform, "system", lambda: "Windows")
     monkeypatch.setattr(core.sistema.ctypes.windll.kernel32, "OpenProcess", lambda *a, **k: 1)
@@ -10,6 +13,7 @@ def test_limpar_ram_windows(monkeypatch):
     monkeypatch.setattr(core.sistema.ctypes.windll.kernel32, "CloseHandle", lambda h: None)
     monkeypatch.setattr(core.sistema.psutil, "process_iter", lambda attrs: [{"info": {"pid": 1234}}])
     core.sistema.limpar_ram_global()
+
 
 #  Testa limpeza de RAM simulando ambiente Linux
 def test_limpar_ram_linux(monkeypatch):
