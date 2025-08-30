@@ -1,10 +1,9 @@
-# tests/conftest.py
 import os
 import pytest
 
 @pytest.fixture(autouse=True)
 def _tmp_logs_dir(tmp_path, monkeypatch):
-    # Isola diretório de logs em cada teste
+    #  Redireciona logs para pasta temporária isolada por teste
     tmp_logs = tmp_path / "logs"
     tmp_logs.mkdir()
     monkeypatch.setenv("PASTA_SERVICES", str(tmp_logs))
@@ -13,7 +12,7 @@ def _tmp_logs_dir(tmp_path, monkeypatch):
 
 @pytest.fixture
 def mock_metricas(monkeypatch):
-    # Força métricas determinísticas
+    #  Retorna métricas fixas para testes previsíveis
     def fake_metricas():
         return {
             "cpu_total": 50.0,
@@ -29,27 +28,27 @@ def mock_metricas(monkeypatch):
 
 @pytest.fixture
 def mock_estado_ram(monkeypatch):
-    # Simula limpeza de RAM sem efeitos reais
+    #  Simula limpeza de RAM sem executar comandos reais
     monkeypatch.setattr("core.sistema.estado_ram_limpa", lambda *a, **k: (40.0, True, False))
 
 @pytest.fixture(autouse=True)
 def mock_sleep(monkeypatch):
-    # Evita atrasos nos testes
+    #  Remove delays nos testes
     monkeypatch.setattr("time.sleep", lambda s: None)
 
 @pytest.fixture(autouse=True)
 def mock_timestamp(monkeypatch):
-    # Timestamp fixo para asserts em logs
+    #  Timestamp fixo para facilitar asserts em logs
     monkeypatch.setattr("services.helpers.timestamp", lambda: "2025-01-01 00:00:00")
     monkeypatch.setattr("main.timestamp", lambda fmt="%Y-%m-%d %H:%M:%S": "2025-01-01 00:00:00")
 
 @pytest.fixture(autouse=True)
 def mock_temperatura(monkeypatch):
-    # monitor.py importa diretamente de core.sistema, então patch aqui:
+    #  Simula leitura de temperatura no monitor
     monkeypatch.setattr("core.monitor.ler_temperatura", lambda: "45°C")
 
 @pytest.fixture(autouse=True)
 def mock_email(monkeypatch):
-    # Bloqueia envio real de e-mail em ambos os pontos
+    #  Bloqueia envio real de e-mail em qualquer ponto
     monkeypatch.setattr("services.helpers.enviar_email_alerta", lambda *a, **k: None)
     monkeypatch.setattr("main.enviar_email_alerta", lambda *a, **k: None)

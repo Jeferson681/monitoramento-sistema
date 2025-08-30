@@ -7,57 +7,69 @@ from email.mime.text import MIMEText
 
 from config.settings import STATUS
 from core.args import parse_args
-from core.sistema import  estado_ram_limpa
+from core.sistema import estado_ram_limpa
 from core.monitor import metricas, formatar_metricas
 from services.logger import gerar_log, registrar_evento
 
-
+#  Gera timestamp com formato padrão
 def timestamp(fmt="%Y-%m-%d %H:%M:%S"):
     return datetime.now().strftime(fmt)
 
+#  Exibe mensagem se verbose=True
 def log_verbose(msg, verbose):
     if verbose:
         print(f"[VERBOSE] {msg}")
 
+#  Envia alerta por e-mail (simulado por padrão)
 def enviar_email_alerta(mensagem, modo_teste=True):
     if not mensagem:
         print("⚠️ Nenhuma mensagem para enviar.")
         return
     if modo_teste:
-        print("📧 [SIMULADO] Mensagem de e-mail:")
+        print(" [SIMULADO] Mensagem de e-mail:")
         print(mensagem)
         return
+
+    # Dados do remetente e destinatário via .env
     remetente = os.getenv("EMAIL_USER")
     senha_app = os.getenv("EMAIL_PASS")
     destinatario = os.getenv("EMAIL_DEST")
+
     if not (remetente and senha_app and destinatario):
-        print("⚠️ Configurações de e-mail ausentes.")
+        print("⚠ Configurações de e-mail ausentes.")
         return
+
+    # Monta e envia e-mail real
     msg = MIMEMultipart()
     msg["From"], msg["To"], msg["Subject"] = remetente, destinatario, "Alerta de Métrica Crítica"
     msg.attach(MIMEText(mensagem, "plain"))
+
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as servidor:
             servidor.starttls()
             servidor.login(remetente, senha_app)
             servidor.sendmail(remetente, destinatario, msg.as_string())
-        print("📨 E-mail enviado com sucesso!")
+        print(" E-mail enviado com sucesso!")
     except Exception as e:
-        print(f"❌ Falha ao enviar e-mail: {e}")
+        print(f" Falha ao enviar e-mail: {e}")
 
+#  Verifica se o nome do componente é relacionado à memória
 def _eh_memoria(nome):
     return str(nome).lower() in {"memoria", "memória", "ram"}
 
+#  Avalia métricas e toma decisões (alerta, limpeza, registro)
 def verificar_metricas(args):
     dados = metricas()
     snapshot_inicial = formatar_metricas(dados)
     print(snapshot_inicial)
 
+    # Flags de estado
     estado_critico = False
     estado_alerta = False
     comp_disparo = None
     valor_disparo = None
 
+    #  Identifica componente em alerta ou crítico
     for nome, valor in dados.items():
         if nome in STATUS and valor is not None:
             lim = STATUS[nome]
@@ -71,6 +83,7 @@ def verificar_metricas(args):
                 comp_disparo = nome
                 valor_disparo = valor
 
+    #  Se for memória crítica, tenta limpar
     houve_critico = estado_critico
     critico_memoria = False
     restaurado = False
@@ -113,9 +126,7 @@ def verificar_metricas(args):
                 gerar_log("restaurado", comp_disparo, valor_antes, valor_depois, snapshot_pos)
         else:
             registrar_evento("alerta_crítico", comp_disparo, valor_disparo, valor_disparo, args, mensagem_extra=snapshot_inicial)
-            gerar_log("alerta_crítico", comp_disparo, valor_disparo, valor_disparo, snapshot_inicial)
-
-    # Reavalia alerta atual
+    #  Reavalia se ainda há alerta após limpeza
     estado_alerta_atual = False
     comp_alerta = None
     valor_alerta = None
@@ -132,7 +143,7 @@ def verificar_metricas(args):
 
     if estado_alerta_atual:
         if houve_critico and not critico_memoria:
-            pass  # já foi tratado no crítico
+            pass  # já tratado
         elif houve_critico and critico_memoria and restaurado and em_alerta_apos_limpeza:
             gerar_log(
                 "restaurado_para_alerta",
@@ -145,10 +156,12 @@ def verificar_metricas(args):
             registrar_evento("alerta_atenção", comp_alerta, valor_alerta, valor_alerta, args, mensagem_extra=snapshot_atual)
             gerar_log("alerta_atenção", comp_alerta, valor_alerta, valor_alerta, snapshot_atual)
 
+    #  Se tudo está estável, registra
     if not houve_critico and not estado_alerta_atual:
         registrar_evento("sistema_estável", "todas", None, None, args, mensagem_extra=snapshot_inicial)
         gerar_log("sistema_estável", "todas", None, None, snapshot_inicial)
 
+#  Executa o monitoramento conforme o modo escolhido
 def executar(args):
     if args.modo == "contínuo":
         log_verbose(f"Iniciando monitoramento com intervalo {args.loop}s", args.verbose)
@@ -161,6 +174,6 @@ def executar(args):
     else:
         verificar_metricas(args)
 
-
+#  Ponto de entrada do sistema
 if __name__ == "__main__":
     executar(parse_args())

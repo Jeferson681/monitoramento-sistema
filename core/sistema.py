@@ -3,41 +3,35 @@ import os
 import platform
 import subprocess
 import time
-
 import psutil
 from pathlib import Path
+
+#  Caminho do script externo para leitura de sensores (Linux)
 SCRIPT_PATH = Path(__file__).parent / "script" / "lm_sensors.sh"
 
-# INFO: Caminho do disco principal
+#  Retorna o caminho do disco principal (C:\ no Windows, / no Linux)
 def obter_disco_principal():
     if os.name == "nt":
         return os.environ.get('SystemDrive', 'C:\\')
     else:
         return '/'
 
-# SCRIPT: sensor.sh externo para tentativa de consulta de temperatura
+#  Executa script externo para tentar obter temperatura via lm_sensors
 def sensor_sh():
     subprocess.run(["bash", str(SCRIPT_PATH)], check=False)
 
-
-# INFO: Verificação de estado de alerta e crítico
+#  Verifica se o valor está em estado de alerta ou crítico
 def verificar_estado(valor, alerta, critico):
     if valor is None:
         return False, False
     return alerta <= valor < critico, valor >= critico
 
-
-import platform
-import psutil
-import ctypes
-import os
-
+#  Tenta limpar RAM ou cache, dependendo do sistema operacional
 def limpar_ram_global():
-    """Limpa RAM ou cache dependendo do sistema"""
     sistema = platform.system().lower()
 
     if sistema == "windows":
-        print("🧹 Limpando RAM no Windows...")
+        print(" Limpando RAM no Windows...")
         for proc in psutil.process_iter(['pid', 'name']):
             try:
                 handle = ctypes.windll.kernel32.OpenProcess(0x1F0FFF, False, proc.info['pid'])
@@ -46,20 +40,19 @@ def limpar_ram_global():
             except Exception:
                 pass  # ignora processos protegidos
     elif sistema == "linux":
-        print("🧹 Limpando cache no Linux...")
+        print(" Limpando cache no Linux...")
         try:
             os.system("sync; echo 3 > /proc/sys/vm/drop_caches")
         except Exception as e:
             print(f"Erro ao limpar cache: {e}")
     else:
-        print(f"⚠️ Limpeza de RAM não suportada para: {sistema}")
+        print(f" Limpeza de RAM não suportada para: {sistema}")
 
-
+#  Executa limpeza de RAM e reavalia se o valor saiu do estado crítico
 def estado_ram_limpa(componente, valor, alerta, critico, metricas_func, sleep_seconds=None):
-    """Tenta limpar RAM e reavalia estado"""
     limpar_ram_global()
     if sleep_seconds is None:
-        sleep_seconds = int(os.getenv("SLEEP_AFTER_CLEAN", "30"))
+        sleep_seconds = int(os.getenv("SLEEP_AFTER_CLEAN", "30"))  # tempo de espera após limpeza
     time.sleep(sleep_seconds)
     novo_valor = metricas_func().get(componente)
     if novo_valor is None:
@@ -68,6 +61,7 @@ def estado_ram_limpa(componente, valor, alerta, critico, metricas_func, sleep_se
     estado_alerta = alerta <= novo_valor < critico
     return novo_valor, estado_restaurado, estado_alerta
 
+#  Tenta ler temperatura via script externo (Linux)
 def ler_temperatura():
     try:
         resultado = subprocess.run(
@@ -77,9 +71,8 @@ def ler_temperatura():
         )
         if resultado.returncode == 0:
             return f"{resultado.stdout.strip()}°C"
-        return None  # Não printa nada, só retorna None
+        return None  # sem saída válida
     except Exception:
         return None
 
-
-# INFO: Coleta de métricas específicas
+# INFO: Coleta de métricas específicas (comentário de rodapé para organização)

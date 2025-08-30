@@ -1,4 +1,3 @@
-# config/settings.py
 import os
 import datetime
 import socket
@@ -7,7 +6,7 @@ from dotenv import load_dotenv
 # Carrega variáveis do .env, se existir
 load_dotenv()
 
-# Infos de tempo e host
+# Info de tempo e host
 now = datetime.datetime.now()
 TIMESTAMP = now.strftime("%Y-%m-%d %H:%M:%S")
 DATE_STR = now.strftime("%Y-%m-%d")

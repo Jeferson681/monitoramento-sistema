@@ -3,14 +3,14 @@ import time
 from core.args import parse_args
 from services.logger import registrar_evento, gerar_log
 from core.monitor import metricas, formatar_metricas
-from services.helpers import log_verbose
 from core.sistema import estado_ram_limpa
+from services.helpers import enviar_email_alerta, log_verbose, timestamp
 
-
+# 🔍 Identifica se o componente é relacionado à memória
 def _eh_memoria(nome):
     return str(nome).lower() in {"memoria", "memória", "ram"}
 
-
+# 🧠 Avalia métricas e toma decisões: alerta, limpeza, registro
 def verificar_metricas(args):
     from config.settings import STATUS
 
@@ -33,6 +33,7 @@ def verificar_metricas(args):
             elif lim["alerta"] <= valor < lim["critico"] and not estado_critico:
                 comp_disparo, valor_disparo = nome, valor
 
+    # Flags de controle
     houve_critico = estado_critico
     critico_memoria = False
     restaurado = False
@@ -48,7 +49,7 @@ def verificar_metricas(args):
             critico_memoria = True
             lim_comp = STATUS[comp_disparo]
 
-            # Tenta corrigir
+            # Tenta corrigir via limpeza
             novo_valor, restaurado, em_alerta_apos_limpeza = estado_ram_limpa(
                 comp_disparo, valor_disparo, lim_comp["alerta"], lim_comp["critico"]
             )
@@ -56,7 +57,7 @@ def verificar_metricas(args):
             snapshot_pos = formatar_metricas(dados)
             valor_depois = novo_valor
 
-            # Log da ação corretiva (informativo)
+            # Log da ação corretiva
             gerar_log(
                 "acao_limpeza_ram",
                 comp_disparo,
@@ -66,19 +67,19 @@ def verificar_metricas(args):
                 f"restaurado={restaurado}, em_alerta={em_alerta_apos_limpeza}"
             )
 
+            # Decide o tipo de evento após tentativa de correção
             if novo_valor >= lim_comp["critico"]:
                 registrar_evento("alerta_crítico", comp_disparo, valor_antes, novo_valor, args, snapshot_pos)
-
             elif em_alerta_apos_limpeza:
                 registrar_evento(
                     "restaurado_para_alerta", comp_disparo, valor_antes, valor_depois, args,
                     f"Estava em crítico (memória), limpeza feita, permanece em ALERTA.\n{snapshot_pos}"
                 )
-
             else:
                 registrar_evento("restaurado", comp_disparo, valor_antes, valor_depois, args, snapshot_pos)
 
         else:
+            # Crítico não relacionado à memória
             registrar_evento("alerta_crítico", comp_disparo, valor_disparo, valor_disparo, args, snapshot_inicial)
 
     # ===============================
@@ -99,7 +100,7 @@ def verificar_metricas(args):
 
     if estado_alerta_atual:
         if houve_critico and not critico_memoria:
-            pass
+            pass  # já tratado
         elif houve_critico and critico_memoria and restaurado and em_alerta_apos_limpeza:
             registrar_evento(
                 "restaurado_para_alerta", comp_alerta,
@@ -116,7 +117,7 @@ def verificar_metricas(args):
     if not houve_critico and not estado_alerta_atual:
         registrar_evento("sistema_estável", "todas", None, None, args, snapshot_inicial)
 
-
+#  Executa o monitoramento conforme o modo escolhido
 def executar(args):
     if args.modo == "contínuo":
         log_verbose(f"Iniciando monitoramento com intervalo {args.loop}s", args.verbose)
@@ -129,6 +130,6 @@ def executar(args):
     else:
         verificar_metricas(args)
 
-
+#  Ponto de entrada do sistema
 if __name__ == "__main__":
     executar(parse_args())

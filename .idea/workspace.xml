@@ -5,13 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0ad11c40-885f-4dc5-91f9-8c551ee12317" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/ci.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/args.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/args.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/monitor.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/monitor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/sistema.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/sistema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/helpers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/logger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/conftest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_logger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sistema.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sistema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +45,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jefer\Documents\scripts\monitoramento\services\logs" />
       <recent name="C:\Users\jefer\Documents\scripts\monitoramento\services" />
       <recent name="C:\Users\jefer\Documents\scripts\monitoramento\logs" />
     </key>
