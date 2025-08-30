@@ -34,12 +34,12 @@ def registrar_evento(tipo, componente, valor_antigo, valor_novo, args, mensagem_
     if getattr(args, "enviar", False):
         enviar_email_alerta(formatar_metricas(metricas(), para_email=True))
 
-def gerar_log(tipo, componente, valor_antigo, valor_novo, mensagem, PASTA_SERVICES=None):
-    if not PASTA_SERVICES:
-        PASTA_SERVICES = os.path.join(os.path.dirname(__file__), "logs")
+def gerar_log(tipo, componente, valor_antigo, valor_novo, mensagem, pasta_services=None):
+    if not pasta_services:
+        pasta_services = os.getenv("PASTA_SERVICES", os.path.join(os.path.dirname(__file__), "logs"))
 
-    os.makedirs(PASTA_SERVICES, exist_ok=True)
-    caminho_arquivo = os.path.join(PASTA_SERVICES, "monitoramento.log")
+    os.makedirs(pasta_services, exist_ok=True)
+    caminho_arquivo = os.path.join(pasta_services, "monitoramento.log")
 
     dados = {
         "tipo": tipo,
@@ -52,6 +52,7 @@ def gerar_log(tipo, componente, valor_antigo, valor_novo, mensagem, PASTA_SERVIC
 
     with open(caminho_arquivo, "a", encoding="utf-8") as f:
         f.write(json.dumps(dados, ensure_ascii=False) + "\n")
+
 
 
 

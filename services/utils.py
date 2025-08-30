@@ -5,8 +5,9 @@ import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from config.settings import STATUS
 from core.args import parse_args
-from core.sistema import limpar_ram_global, estado_ram_limpa
+from core.sistema import  estado_ram_limpa
 from core.monitor import metricas, formatar_metricas
 from services.logger import gerar_log, registrar_evento
 

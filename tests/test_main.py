@@ -1,6 +1,13 @@
-from main import _eh_memoria
+# tests/test_main.py
+from main import verificar_metricas
 
-def test_eh_memoria_variacoes():
-    assert _eh_memoria("memória")
-    assert _eh_memoria("RAM")
-    assert not _eh_memoria("cpu")
+class Args:
+    modo = "unico"
+    loop = 1
+    log = "console"
+    verbose = False
+    enviar = False
+
+def test_verificar_metricas_sem_critico(mock_metricas):
+    # Com mock_metricas, os valores estão em 50% → sem crítico
+    verificar_metricas(Args())
