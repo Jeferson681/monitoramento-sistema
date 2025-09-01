@@ -18,14 +18,14 @@ def parse_args():
         "--loop",
         type=int,
         default=int(os.getenv("LOOP_SECONDS", "30")),  # pode vir do .env
-        help="Intervalo em segundos no modo contínuo"
+        help="Intervalo em segundos no modo continuo"
     )
     # --ciclos: número de execuções antes de encerrar (modo contínuo)
     parser.add_argument(
         "--ciclos",
         type=int,
         default=None,  # None = infinito
-        help="Número de ciclos no modo contínuo (None = infinito)"
+        help="Número de ciclos no modo continuo (None = infinito)"
     )
 
     # --log: define onde os logs vão aparecer (console ou arquivo)
@@ -37,9 +37,17 @@ def parse_args():
     )
 
     # --verbose: ativa logs detalhados
-    parser.add_argument("--verbose", action="store_true", help="Ativa logs verbosos")
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Ativa logs verbosos"
+    )
 
     # --enviar: ativa envio de e-mail em caso de evento
-    parser.add_argument("--enviar", action="store_true", help="Envia e-mail quando há evento")
+    parser.add_argument(
+        "--enviar",
+        action="store_true",
+        help="Envia e-mail quando há evento"
+    )
 
     return parser.parse_args()

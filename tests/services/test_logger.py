@@ -1,6 +1,6 @@
 # tests/test_logger.py
 import os
-from services.logger import gerar_log
+from src.services.logger import gerar_log
 
 # ✅ Testa se o log é criado corretamente no diretório temporário
 def test_gerar_log_cria_arquivo(tmp_path, monkeypatch):

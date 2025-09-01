@@ -1,4 +1,4 @@
-from core.monitor import metricas, formatar_metricas
+from src.core.monitor import metricas, formatar_metricas
 
 # ✅ Garante que as chaves principais estão presentes nas métricas
 def test_metricas_keys():

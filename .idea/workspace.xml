@@ -4,11 +4,42 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0ad11c40-885f-4dc5-91f9-8c551ee12317" name="Changes" comment="" />
+    <list default="true" id="0ad11c40-885f-4dc5-91f9-8c551ee12317" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/core/evaluator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/services/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/monitoramento.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/monitoramento.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/args.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/args.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/monitor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/monitor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/sistema.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/system.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_helpers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_logger.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/core/test_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_monitor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_sistema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_status.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/services/test_utils.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -34,9 +65,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jefer\Documents\scripts\monitoramento\tests\services" />
+      <recent name="C:\Users\jefer\Documents\scripts\monitoramento\tests\core" />
+      <recent name="C:\Users\jefer\Documents\scripts\monitoramento\src" />
       <recent name="C:\Users\jefer\Documents\scripts\monitoramento\services\logs" />
       <recent name="C:\Users\jefer\Documents\scripts\monitoramento\services" />
-      <recent name="C:\Users\jefer\Documents\scripts\monitoramento\logs" />
     </key>
   </component>
   <component name="SharedIndexes">

@@ -1,4 +1,4 @@
-from core.args import parse_args
+from src.core import parse_args
 
 # ✅ Testa se os valores padrão são aplicados quando nenhum argumento é passado
 def test_parse_args_default(monkeypatch):

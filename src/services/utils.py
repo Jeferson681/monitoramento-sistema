@@ -48,3 +48,7 @@ def enviar_email_alerta(mensagem, modo_teste=True):
         print(" E-mail enviado com sucesso!")
     except Exception as e:
         print(f" Falha ao enviar e-mail: {e}")
+
+def debug_log(msg, arquivo="debug_ping.log"):
+    with open(arquivo, "a", encoding="utf-8") as f:
+        f.write(msg + "\n")

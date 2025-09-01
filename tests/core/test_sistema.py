@@ -1,6 +1,5 @@
 import pytest
 
-import core.sistema
 import platform
 import subprocess
 

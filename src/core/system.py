@@ -75,4 +75,32 @@ def ler_temperatura():
     except Exception:
         return None
 
+#  Lê temperaturas de CPU, placa-mãe e GPU via script bash (Linux)
+def ler_temperaturas_bash():
+    """
+    Executa o script lm_sensors.sh e retorna um dicionário com as temperaturas coletadas.
+    Espera saída no formato:
+      cpu_temp=XX
+      mb_temp=YY
+      gpu_temp=ZZ
+    """
+    try:
+        resultado = subprocess.run(
+            ["bash", str(SCRIPT_PATH)],
+            capture_output=True,
+            text=True
+        )
+        temps = {}
+        if resultado.returncode == 0:
+            for line in resultado.stdout.strip().splitlines():
+                if "=" in line:
+                    chave, valor = line.strip().split("=", 1)
+                    try:
+                        temps[chave.strip()] = float(valor.strip())
+                    except ValueError:
+                        temps[chave.strip()] = None
+        return temps
+    except Exception:
+        return {}  # em caso de erro, retorna dicionário vazio
+
 # INFO: Coleta de métricas específicas (comentário de rodapé para organização)

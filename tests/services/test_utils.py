@@ -1,6 +1,6 @@
 # tests/test_utils.py
 
-from services.utils import (
+from src.services.utils import (
     log_verbose,
     timestamp,
     enviar_email_alerta

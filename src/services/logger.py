@@ -4,7 +4,8 @@ import os
 
 from config.settings import LOG_JSON_FILE
 from core.monitor import formatar_metricas, metricas
-from services.helpers import log_verbose, enviar_email_alerta, timestamp
+from services.helpers import log_verbose, timestamp
+from services.utils import enviar_email_alerta
 
 #  Define pasta padrão para salvar logs locais
 PASTA_SERVICES = os.path.join(os.path.dirname(__file__), "logs")
@@ -30,7 +31,7 @@ def registrar_evento(tipo, componente, valor_antigo, valor_novo, args, mensagem_
         with open(LOG_JSON_FILE, "a") as f:
             f.write(json.dumps(log) + "\n")
     else:
-        print(log)
+        return
 
     # Exibe log verboso no console (se ativado)
     log_verbose(f"Evento registrado: {log}", getattr(args, "verbose", False))

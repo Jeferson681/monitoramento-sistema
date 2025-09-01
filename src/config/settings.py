@@ -29,6 +29,13 @@ THRESH_CPU_CRITICO = float(os.getenv("THRESH_CPU_CRITICO", "90"))
 THRESH_DISCO_ALERTA = float(os.getenv("THRESH_DISCO_ALERTA", "80"))
 THRESH_DISCO_CRITICO = float(os.getenv("THRESH_DISCO_CRITICO", "95"))
 
+# Limiares para estados de ping e latência (em ms)
+THRESH_PING_ALERTA = float(os.getenv("THRESH_PING_ALERTA", "50"))      # até 50 ms = bom
+THRESH_PING_CRITICO = float(os.getenv("THRESH_PING_CRITICO", "150"))   # acima de 150 ms = ruim
+
+THRESH_LATENCIA_ALERTA = float(os.getenv("THRESH_LATENCIA_ALERTA", "50"))      # até 50 ms = bom
+THRESH_LATENCIA_CRITICO = float(os.getenv("THRESH_LATENCIA_CRITICO", "150"))   # acima de 150 ms = ruim
+
 # Execução
 LOOP_SECONDS = int(os.getenv("LOOP_SECONDS", "30"))
 SLEEP_AFTER_CLEAN = int(os.getenv("SLEEP_AFTER_CLEAN", "30"))
@@ -51,5 +58,13 @@ STATUS = {
     "disco_percent": {
         "alerta": THRESH_DISCO_ALERTA,
         "critico": THRESH_DISCO_CRITICO
+    },
+    "ping_ms": {
+        "alerta": THRESH_PING_ALERTA,
+        "critico": THRESH_PING_CRITICO
+    },
+    "latencia_tcp_ms": {
+        "alerta": THRESH_LATENCIA_ALERTA,
+        "critico": THRESH_LATENCIA_CRITICO
     }
 }

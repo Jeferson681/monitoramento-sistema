@@ -1,9 +1,9 @@
-from main import executar
+from src.main import executar
 
 # ✅ Testa execução em modo contínuo com interrupção simulada
 def test_executar_continuo_interrompido(monkeypatch, capsys):
     class Args:
-        modo = "contínuo"
+        modo = "continuo"
         loop = 1
         log = "console"
         verbose = True

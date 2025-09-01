@@ -16,4 +16,4 @@ COPY . .
 
 # 6. Comando padrão
 ENTRYPOINT ["python", "main.py"]
-CMD ["--modo", "contínuo", "--loop", "30"]
+CMD ["--modo", "continuo", "--loop", "30"]
