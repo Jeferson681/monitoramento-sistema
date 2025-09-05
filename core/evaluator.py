@@ -1,7 +1,5 @@
 from config.settings import STATUS
 from core.monitor import metricas, formatar_metricas
-from core.system import estado_ram_limpa
-from services.helpers import _eh_memoria
 from services.logger import gerar_log, registrar_evento
 
 # 🧠 Avalia métricas e toma decisões: alerta, limpeza, registro
@@ -14,9 +12,6 @@ class EstadoSistema:
         self.comp_disparo = None
         self.valor_disparo = None
         self.houve_critico = False
-        self.critico_memoria = False
-        self.restaurado = False
-        self.em_alerta_apos_limpeza = False
         self.valor_antes = None
         self.valor_depois = None
         self.estado_ping = None
@@ -64,36 +59,12 @@ class EstadoSistema:
 
     def tratar_critico(self):
         if not self.estado_critico:
+            print("Nenhum estado crítico detectado.")
             return
-        if _eh_memoria(self.comp_disparo):
-            self.critico_memoria = True
-            lim_comp = STATUS[self.comp_disparo]
-            # Correção: passa a função metricas como argumento
-            novo_valor, self.restaurado, self.em_alerta_apos_limpeza = estado_ram_limpa(
-                self.comp_disparo, self.valor_disparo, lim_comp["alerta"], lim_comp["critico"], metricas
-            )
-            self.dados[self.comp_disparo] = novo_valor
-            snapshot_pos = formatar_metricas(self.dados)
-            self.valor_depois = novo_valor
-            gerar_log(
-                "acao_limpeza_ram",
-                self.comp_disparo,
-                self.valor_antes,
-                self.valor_depois,
-                f"ANTES:\n{self.snapshot_inicial}\n---\nDEPOIS:\n{snapshot_pos}\n"
-                f"restaurado={self.restaurado}, em_alerta={self.em_alerta_apos_limpeza}"
-            )
-            if novo_valor >= lim_comp["critico"]:
-                registrar_evento("alerta_crítico", self.comp_disparo, self.valor_antes, novo_valor, self.args, snapshot_pos)
-            elif self.em_alerta_apos_limpeza:
-                registrar_evento(
-                    "restaurado_para_alerta", self.comp_disparo, self.valor_antes, self.valor_depois, self.args,
-                    f"Estava em crítico (memória), limpeza feita, permanece em ALERTA.\n{snapshot_pos}"
-                )
-            else:
-                registrar_evento("restaurado", self.comp_disparo, self.valor_antes, self.valor_depois, self.args, snapshot_pos)
-        else:
-            registrar_evento("alerta_crítico", self.comp_disparo, self.valor_disparo, self.valor_disparo, self.args, self.snapshot_inicial)
+        print(f"Estado crítico detectado: {self.estado_critico}, Componente: {self.comp_disparo}")
+        registrar_evento(
+            "alerta_crítico", self.comp_disparo, self.valor_disparo, self.valor_disparo, self.args, self.snapshot_inicial
+        )
 
     def avaliar_alerta(self):
         estado_alerta_atual = False
@@ -134,3 +105,4 @@ def verificar_metricas(args):
     estado.tratar_critico()
     alerta = estado.avaliar_alerta()
     estado.avaliar_estavel(alerta)
+

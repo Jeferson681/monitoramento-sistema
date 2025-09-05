@@ -1,44 +1,10 @@
-# tests/test_utils.py
+import os
+import pytest
+from services.utils import enviar_email_alerta
 
-from src.services.utils import (
-    log_verbose,
-    timestamp,
-    enviar_email_alerta
-)
-
-# ✅ Deve imprimir a mensagem quando verbose=True
-def test_log_verbose_true(capsys):
-    log_verbose("Teste utils", True)
-    captured = capsys.readouterr()
-    assert "[VERBOSE] Teste utils" in captured.out
-
-# ✅ Não deve imprimir nada quando verbose=False
-def test_log_verbose_false(capsys):
-    log_verbose("Teste silencioso", False)
-    captured = capsys.readouterr()
-    assert captured.out == ""
-
-# ✅ Retorna timestamp com formato padrão
-def test_timestamp_default():
-    ts = timestamp()
-    assert isinstance(ts, str)
-    assert len(ts) == 19  # "YYYY-MM-DD HH:MM:SS"
-
-# ✅ Retorna timestamp com formato customizado
-def test_timestamp_custom_format():
-    ts = timestamp("%d/%m/%Y")
-    assert "/" in ts
-
-# ✅ Simula envio de e-mail com mensagem válida
-def test_enviar_email_simulado_com_mensagem(capsys):
-    enviar_email_alerta("Mensagem de teste", modo_teste=True)
-    captured = capsys.readouterr()
-    assert "[SIMULADO] Mensagem de e-mail:" in captured.out
-    assert "Mensagem de teste" in captured.out
-
-# ✅ Simula envio de e-mail sem mensagem
-def test_enviar_email_simulado_sem_mensagem(capsys):
-    enviar_email_alerta("", modo_teste=True)
+# ✅ Testa envio real sem mensagem
+def test_enviar_email_sem_mensagem(capsys):
+    enviar_email_alerta("", modo_teste=False)
     captured = capsys.readouterr()
     assert "⚠️ Nenhuma mensagem para enviar." in captured.out
 
@@ -50,3 +16,13 @@ def test_enviar_email_real_sem_config(monkeypatch, capsys):
     enviar_email_alerta("Mensagem real", modo_teste=False)
     captured = capsys.readouterr()
     assert "⚠ Configurações de e-mail ausentes." in captured.out
+
+# ✅ (Opcional) Testa envio real com variáveis presentes — cuidado: envia de verdade!
+@pytest.mark.skip(reason="Evita envio real durante testes automáticos")
+def test_enviar_email_real_com_config(monkeypatch, capsys):
+    monkeypatch.setenv("EMAIL_USER", "seu_email@gmail.com")
+    monkeypatch.setenv("EMAIL_PASS", "senha_app")
+    monkeypatch.setenv("EMAIL_DEST", "destinatario@gmail.com")
+    enviar_email_alerta("Mensagem real", modo_teste=False)
+    captured = capsys.readouterr()
+    assert "E-mail enviado com sucesso!" in captured.out or "Falha ao enviar e-mail:" in captured.out

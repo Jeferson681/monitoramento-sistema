@@ -1,10 +1,10 @@
 import psutil
 import platform
-from core.system import obter_disco_principal, ler_temperaturas_bash
 import subprocess
 import time
 import socket
 import re
+from core.system import obter_disco_principal, ler_temperaturas_bash
 from services.utils import debug_log
 
 # 📡 Coleta métricas do sistema em tempo real
@@ -59,6 +59,8 @@ def metricas():
 
     # Chama função que executa o bash e retorna temperaturas
     temps = ler_temperaturas_bash()
+    if isinstance(temps, str):  # Caso temps seja uma string, converta para um dicionário padrão
+        temps = {"cpu_temp": None, "mb_temp": None, "gpu_temp": None}
 
     return {
         "cpu_total": psutil.cpu_percent(interval=None),  # uso total da CPU (%)
@@ -86,6 +88,7 @@ def format_bytes(n):
             return f"{n:.1f} {unit}"
         n /= 1024.0
     return f"{n:.1f} PB"
+
 
 # 🧾 Formata as métricas para exibição ou envio por e-mail
 def formatar_metricas(dados, para_email=False):

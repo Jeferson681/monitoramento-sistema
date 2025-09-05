@@ -1,4 +1,4 @@
-from src.core.monitor import metricas, formatar_metricas
+from core.monitor import metricas, formatar_metricas
 
 # ✅ Garante que as chaves principais estão presentes nas métricas
 def test_metricas_keys():
@@ -17,8 +17,8 @@ def test_formatar_metricas_output():
         "disco_usado": 100.0,
         "disco_total": 200.0,
         "disco_percent": 50.0,
-        "temperatura": "45°C"
+        "temperatura_cpu": "45°C"
     }
     texto = formatar_metricas(dados)
     assert "CPU: 50.0%" in texto
-    assert "Temperatura: 45°C" in texto
+    assert "Temperatura CPU: 45°C" in texto  # Ajuste aqui

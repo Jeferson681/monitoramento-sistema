@@ -1,7 +1,8 @@
+from dotenv import load_dotenv
 import os
 import datetime
 import socket
-from dotenv import load_dotenv
+
 
 # Carrega variáveis do .env, se existir
 load_dotenv()
@@ -68,3 +69,4 @@ STATUS = {
         "critico": THRESH_LATENCIA_CRITICO
     }
 }
+

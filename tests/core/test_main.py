@@ -1,4 +1,5 @@
-from src.main import executar
+from main import executar
+import pytest
 
 # ✅ Testa execução em modo contínuo com interrupção simulada
 def test_executar_continuo_interrompido(monkeypatch, capsys):

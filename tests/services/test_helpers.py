@@ -1,4 +1,4 @@
-from src.services.helpers import log_verbose, enviar_email_alerta
+from services.helpers import log_verbose
 
 #  Deve imprimir a mensagem quando verbose=True
 def test_log_verbose_true(capsys):

@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest.mock import patch
 
 #  Gera timestamp no formato padrão do sistema
 def timestamp():
@@ -10,5 +11,6 @@ def log_verbose(msg, verbose=False):
         print(f"[VERBOSE] {msg}")
 
 # 🔍 Identifica se o componente é relacionado à memória
+@patch("services.helpers._eh_memoria", return_value=True)
 def _eh_memoria(nome):
     return str(nome).lower() in {"memoria", "memória", "ram"}

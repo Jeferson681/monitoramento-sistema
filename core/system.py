@@ -50,16 +50,30 @@ def limpar_ram_global():
 
 #  Executa limpeza de RAM e reavalia se o valor saiu do estado crítico
 def estado_ram_limpa(componente, valor, alerta, critico, metricas_func, sleep_seconds=None):
-    limpar_ram_global()
-    if sleep_seconds is None:
-        sleep_seconds = int(os.getenv("SLEEP_AFTER_CLEAN", "30"))  # tempo de espera após limpeza
-    time.sleep(sleep_seconds)
-    novo_valor = metricas_func().get(componente)
-    if novo_valor is None:
+    try:
+        # Executa a limpeza de RAM
+        limpar_ram_global()
+
+        # Define o tempo de espera após a limpeza
+        if sleep_seconds is None:
+            sleep_seconds = int(os.getenv("SLEEP_AFTER_CLEAN", "30"))
+        time.sleep(sleep_seconds)
+
+        # Obtém o novo valor do componente
+        novo_valor = metricas_func().get(componente)
+        if novo_valor is None:
+            print(f"[ERRO] Não foi possível obter o valor atualizado para o componente: {componente}")
+            return valor, False, False
+
+        # Avalia os estados
+        estado_restaurado = novo_valor < critico
+        estado_alerta = alerta <= novo_valor < critico
+
+        return novo_valor, estado_restaurado, estado_alerta
+
+    except Exception as e:
+        print(f"[ERRO] Falha ao executar estado_ram_limpa: {e}")
         return valor, False, False
-    estado_restaurado = novo_valor < critico
-    estado_alerta = alerta <= novo_valor < critico
-    return novo_valor, estado_restaurado, estado_alerta
 
 #  Tenta ler temperatura via script externo (Linux)
 def ler_temperatura():

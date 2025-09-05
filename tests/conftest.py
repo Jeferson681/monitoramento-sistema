@@ -26,11 +26,6 @@ def mock_metricas(monkeypatch):
         }
     monkeypatch.setattr("core.monitor.metricas", fake_metricas)
 
-@pytest.fixture
-def mock_estado_ram(monkeypatch):
-    #  Simula limpeza de RAM sem executar comandos reais
-    monkeypatch.setattr("core.sistema.estado_ram_limpa", lambda *a, **k: (40.0, True, False))
-
 @pytest.fixture(autouse=True)
 def mock_sleep(monkeypatch):
     #  Remove delays nos testes
@@ -39,16 +34,15 @@ def mock_sleep(monkeypatch):
 @pytest.fixture(autouse=True)
 def mock_timestamp(monkeypatch):
     #  Timestamp fixo para facilitar asserts em logs
-    monkeypatch.setattr("services.helpers.timestamp", lambda: "2025-01-01 00:00:00")
+    monkeypatch.setattr("services.helpers.timestamp", lambda fmt="%Y-%m-%d %H:%M:%S": "2025-01-01 00:00:00")
     monkeypatch.setattr("main.timestamp", lambda fmt="%Y-%m-%d %H:%M:%S": "2025-01-01 00:00:00")
 
 @pytest.fixture(autouse=True)
 def mock_temperatura(monkeypatch):
     #  Simula leitura de temperatura no monitor
-    monkeypatch.setattr("core.monitor.ler_temperatura", lambda: "45°C")
+    monkeypatch.setattr("core.monitor.ler_temperaturas_bash", lambda: "45°C")
 
 @pytest.fixture(autouse=True)
 def mock_email(monkeypatch):
     #  Bloqueia envio real de e-mail em qualquer ponto
-    monkeypatch.setattr("services.helpers.enviar_email_alerta", lambda *a, **k: None)
-    monkeypatch.setattr("main.enviar_email_alerta", lambda *a, **k: None)
+    monkeypatch.setattr("services.utils.enviar_email_alerta", lambda *a, **k: None)

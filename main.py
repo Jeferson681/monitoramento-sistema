@@ -2,7 +2,8 @@ import time
 
 from core.args import parse_args
 from core.evaluator import verificar_metricas
-from services.helpers import log_verbose
+from services.helpers import log_verbose, timestamp
+from services.utils import enviar_email_alerta
 
 
 #  Executa o monitoramento conforme o modo escolhido
@@ -24,6 +25,7 @@ def executar(args):
             print("Fim do Ciclo")
     else:
         verificar_metricas(args)
+
 
 #  Ponto de entrada do sistema
 if __name__ == "__main__":
