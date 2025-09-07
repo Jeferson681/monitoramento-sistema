@@ -49,14 +49,14 @@ def test_medir_memoria(mock_virtual_memory):
     mock_virtual_memory.assert_called_once()  # Não deve chamar novamente
 
 # Testa obter_disco_principal com cache
+@patch("src.core.system.os.environ.get", return_value="C:\\")
 @patch("psutil.disk_usage")
-@patch("os.environ.get", return_value="C:\\")
-def test_obter_disco_principal(mock_environ_get, mock_disk_usage):
+def test_obter_disco_principal(mock_disk_usage, mock_environ_get):
     mock_disk_usage.return_value = MagicMock(
         total=1000, used=500, free=500, percent=50.0
     )
     # Limpa o cache para garantir que o mock será usado
-    from src.core import system
+    import src.core.system as system
     system.cache["disk"]["last_updated"] = 0
 
     disco = obter_disco_principal()
@@ -65,7 +65,7 @@ def test_obter_disco_principal(mock_environ_get, mock_disk_usage):
     assert disco["data"]["free"] == 500
     assert disco["data"]["percent"] == 50.0
     assert "timestamp" in disco
-    mock_environ_get.assert_called()  # Só verifica na primeira chamada
+    mock_environ_get.assert_called()
 
     # Segunda chamada (usa o cache)
     disco_cached = obter_disco_principal()
