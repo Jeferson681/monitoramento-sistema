@@ -33,9 +33,8 @@ def mock_sleep(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def mock_timestamp(monkeypatch):
-    #  Timestamp fixo para facilitar asserts em logs
+    # Timestamp fixo para facilitar asserts em logs
     monkeypatch.setattr("services.helpers.timestamp", lambda fmt="%Y-%m-%d %H:%M:%S": "2025-01-01 00:00:00")
-    monkeypatch.setattr("main.timestamp", lambda fmt="%Y-%m-%d %H:%M:%S": "2025-01-01 00:00:00")
 
 @pytest.fixture(autouse=True)
 def mock_temperatura(monkeypatch):

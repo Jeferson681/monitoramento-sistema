@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument(
         "--log",
         choices=["console", "arquivo"],
-        default=os.getenv("DESTINO_LOG", "console"),  # pode vir do .env
+        default=os.getenv("DESTINO_LOG", "arquivo"),  # padrão agora é "arquivo"
         help="Destino do log"
     )
 

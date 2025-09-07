@@ -40,3 +40,6 @@ Thumbs.db
 
 #  Testes (opcional — remova se quiser versionar)
 tests/__pycache__/
+
+# Documentação e ideias pessoais
+docs/ideias

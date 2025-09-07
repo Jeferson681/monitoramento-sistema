@@ -1,9 +1,8 @@
 import time
 
-from core.args import parse_args
-from core.evaluator import verificar_metricas
-from services.helpers import log_verbose, timestamp
-from services.utils import enviar_email_alerta
+from src.core.args import parse_args
+from src.core.evaluator import verificar_metricas
+from src.services.helpers import log_verbose
 
 
 #  Executa o monitoramento conforme o modo escolhido
@@ -12,12 +11,12 @@ def executar(args):
         contador = 0
         try:
             while True:
-                log_verbose(f"Iniciando monitoramento com intervalo {args.loop}s", args.verbose)
+                log_verbose(f"Iniciando monitoramento com intervalo {getattr(args, 'loop', 1)}s", args.verbose)
                 verificar_metricas(args)
                 contador += 1
-                if args.ciclos and contador >= args.ciclos:
+                if getattr(args, 'ciclos', None) is not None and args.ciclos > 0 and contador >= args.ciclos:
                     break
-                time.sleep(args.loop)
+                time.sleep(getattr(args, 'loop', 1))
         except KeyboardInterrupt:
             print("\n[INFO] Monitoramento interrompido.")
         # "Fim do Ciclo" só será exibido se o loop terminar normalmente (não por KeyboardInterrupt)

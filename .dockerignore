@@ -20,3 +20,6 @@ Thumbs.db
 
 # Testes (se não quiser incluir na imagem final)
 tests/
+
+# Documentação e ideias pessoais
+docs/ideias

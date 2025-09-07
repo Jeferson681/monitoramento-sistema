@@ -20,32 +20,27 @@ EMAIL_USER = os.getenv("EMAIL_USER", "")
 EMAIL_PASS = os.getenv("EMAIL_PASS", "")
 EMAIL_TO = os.getenv("EMAIL_TO", "")
 
-# Limiares
-THRESH_MEM_ALERTA = float(os.getenv("THRESH_MEM_ALERTA", "75"))
-THRESH_MEM_CRITICO = float(os.getenv("THRESH_MEM_CRITICO", "90"))
+# Limiares (ajustados para uso pessoal/dev, ciclos longos)
+THRESH_MEM_ALERTA = float(os.getenv("THRESH_MEM_ALERTA", "80"))
+THRESH_MEM_CRITICO = float(os.getenv("THRESH_MEM_CRITICO", "95"))
 
-THRESH_CPU_ALERTA = float(os.getenv("THRESH_CPU_ALERTA", "75"))
-THRESH_CPU_CRITICO = float(os.getenv("THRESH_CPU_CRITICO", "90"))
+THRESH_CPU_ALERTA = float(os.getenv("THRESH_CPU_ALERTA", "85"))
+THRESH_CPU_CRITICO = float(os.getenv("THRESH_CPU_CRITICO", "95"))
 
-THRESH_DISCO_ALERTA = float(os.getenv("THRESH_DISCO_ALERTA", "80"))
+THRESH_DISCO_ALERTA = float(os.getenv("THRESH_DISCO_ALERTA", "85"))
 THRESH_DISCO_CRITICO = float(os.getenv("THRESH_DISCO_CRITICO", "95"))
 
 # Limiares para estados de ping e latência (em ms)
-THRESH_PING_ALERTA = float(os.getenv("THRESH_PING_ALERTA", "50"))      # até 50 ms = bom
-THRESH_PING_CRITICO = float(os.getenv("THRESH_PING_CRITICO", "150"))   # acima de 150 ms = ruim
+THRESH_PING_ALERTA = float(os.getenv("THRESH_PING_ALERTA", "100"))      
+THRESH_PING_CRITICO = float(os.getenv("THRESH_PING_CRITICO", "300"))   
 
-THRESH_LATENCIA_ALERTA = float(os.getenv("THRESH_LATENCIA_ALERTA", "50"))      # até 50 ms = bom
-THRESH_LATENCIA_CRITICO = float(os.getenv("THRESH_LATENCIA_CRITICO", "150"))   # acima de 150 ms = ruim
+THRESH_LATENCIA_ALERTA = float(os.getenv("THRESH_LATENCIA_ALERTA", "100"))  
+THRESH_LATENCIA_CRITICO = float(os.getenv("THRESH_LATENCIA_CRITICO", "300"))
 
 # Execução
 LOOP_SECONDS = int(os.getenv("LOOP_SECONDS", "30"))
 SLEEP_AFTER_CLEAN = int(os.getenv("SLEEP_AFTER_CLEAN", "30"))
 
-# Diretórios e logs
-LOG_DIR = os.getenv("LOG_DIR", os.path.join("services", "logs"))
-os.makedirs(LOG_DIR, exist_ok=True)
-LOG_JSON_FILE = os.path.join(LOG_DIR, f"log_metricas_{DATE_STR}.json")
-LOG_FILE = os.path.join(LOG_DIR, f"log_{DATE_STR}.txt")
 
 STATUS = {
     "cpu_total": {
