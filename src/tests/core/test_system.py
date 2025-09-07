@@ -56,6 +56,7 @@ def test_obter_disco_principal(mock_environ_get, mock_disk_usage):
         total=1000, used=500, free=500, percent=50.0
     )
     # Limpa o cache para garantir que o mock será usado
+    from src.core import system
     system.cache["disk"]["last_updated"] = 0
 
     disco = obter_disco_principal()
@@ -64,11 +65,12 @@ def test_obter_disco_principal(mock_environ_get, mock_disk_usage):
     assert disco["data"]["free"] == 500
     assert disco["data"]["percent"] == 50.0
     assert "timestamp" in disco
+    mock_environ_get.assert_called()  # Só verifica na primeira chamada
 
     # Segunda chamada (usa o cache)
     disco_cached = obter_disco_principal()
     assert disco_cached == disco
-    mock_environ_get.assert_called()  # Não deve chamar novamente
+    # Não precisa verificar mock_environ_get novamente
 
 # Testa ler_temperaturas_bash com saída válida
 @patch("subprocess.run")
