@@ -10,13 +10,14 @@ DADOS_FAKE = {
     "disco_percent": 97
 }
 
+class ArgsFake:
+    modo = "teste"
+    log = "arquivo"
+    verbose = False
+    enviar = False
+
 @pytest.fixture(autouse=True)
 def mock_parse_args(monkeypatch):
-    class ArgsFake:
-        modo = "teste"
-        log = "arquivo"
-        verbose = False
-        enviar = False
     monkeypatch.setattr("core.args.parse_args", lambda: ArgsFake())
 
 @pytest.fixture
