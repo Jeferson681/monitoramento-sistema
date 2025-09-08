@@ -36,6 +36,8 @@ Logs/json/
 Logs/json/*.jsonl
 Logs/log/
 Logs/log/*.log
+Logs/**/*.log
+Logs/**/*.jsonl
 
 # Diretórios ocultos e de sistema
 .DS_Store

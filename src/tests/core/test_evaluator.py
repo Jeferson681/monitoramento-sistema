@@ -11,10 +11,12 @@ DADOS_FAKE = {
 }
 
 class ArgsFake:
-    modo = "teste"
-    log = "arquivo"
+    modo = "unico"
+    log = "console"
     verbose = False
     enviar = False
+    loop = 1
+    ciclos = 1
 
 @pytest.fixture(autouse=True)
 def mock_parse_args(monkeypatch):
