@@ -8,13 +8,15 @@ jobs:
   gitguardian:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout código
+      - name: Clonar repositório
         uses: actions/checkout@v4
 
       - name: Instalar ggshield
         run: pip install --upgrade ggshield
 
-      - name: Run ggshield secret scan
+      - name: Rodar GitGuardian scan
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
         run: ggshield secret scan repo .
 
   test:

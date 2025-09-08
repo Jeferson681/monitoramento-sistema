@@ -50,4 +50,4 @@ def parse_args():
         help="Envia e-mail quando há evento"
     )
 
-    return parser.parse_args()
+    return parser.parse_known_args()[0]

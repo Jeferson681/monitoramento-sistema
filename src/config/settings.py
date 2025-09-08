@@ -13,12 +13,12 @@ TIMESTAMP = now.strftime("%Y-%m-%d %H:%M:%S")
 DATE_STR = now.strftime("%Y-%m-%d")
 HOSTNAME = socket.gethostname()
 
-# Email e alertas
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.exemplo.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
-EMAIL_USER = os.getenv("EMAIL_USER", "")
-EMAIL_PASS = os.getenv("EMAIL_PASS", "")
-EMAIL_TO = os.getenv("EMAIL_TO", "")
+# Email e alertas (valores padrão são exemplos, não reais)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "example.com")         # Exemplo, não use em produção
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))            # Exemplo, não use em produção
+EMAIL_USER = os.getenv("EMAIL_USER", "usuario_exemplo")     # Exemplo, não use em produção
+EMAIL_PASS = os.getenv("EMAIL_PASS", "senha_exemplo")       # Exemplo, não use em produção
+EMAIL_TO = os.getenv("EMAIL_TO", "destinatario@exemplo.com")# Exemplo, não use em produção
 
 # Limiares (ajustados para uso pessoal/dev, ciclos longos)
 THRESH_MEM_ALERTA = float(os.getenv("THRESH_MEM_ALERTA", "80"))
