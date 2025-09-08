@@ -10,7 +10,7 @@ import tempfile
 import subprocess
 import platform
 import json
-from src.services.helpers import timestamp, log_verbose
+from services.helpers import timestamp, log_verbose
 
 # Caminhos de logs padronizados (igual logger.py)
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -55,24 +55,60 @@ def debug_log(msg, arquivo=None):
     with open(arquivo, "a", encoding="utf-8") as f:
         f.write(msg + "\n")
 
-def liberar_memoria_processo(pid):
-    try:
-        PROCESS_SET_QUOTA = 0x0100
-        PROCESS_QUERY_INFORMATION = 0x0400
-        PROCESS_VM_READ = 0x0010
+def liberar_memoria_processo(pid=None):
+    if not pode_executar_tratamento("liberar_ram_global"):
+        print("⏳ liberar_memoria_processo só pode ser executado a cada 30 minutos.")
+        return False
+    sistema = platform.system().lower()
+    if sistema == "windows":
+        # Libera memória de um processo específico ou de todos se pid for None
+        def liberar(pid):
+            try:
+                PROCESS_SET_QUOTA = 0x0100
+                PROCESS_QUERY_INFORMATION = 0x0400
+                PROCESS_VM_READ = 0x0010
+                handle = ctypes.windll.kernel32.OpenProcess(
+                    PROCESS_SET_QUOTA | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+                    False,
+                    pid
+                )
+                if handle:
+                    ctypes.windll.psapi.EmptyWorkingSet(handle)
+                    ctypes.windll.kernel32.CloseHandle(handle)
+                    return True
+            except Exception:
+                pass
+            return False
 
-        handle = ctypes.windll.kernel32.OpenProcess(
-            PROCESS_SET_QUOTA | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-            False,
-            pid
-        )
-        if handle:
-            ctypes.windll.psapi.EmptyWorkingSet(handle)
-            ctypes.windll.kernel32.CloseHandle(handle)
-            return True
-    except Exception:
-        pass
-    return False
+        if pid is not None:
+            return liberar(pid)
+        else:
+            total_limpos = 0
+            for proc in psutil.process_iter(['pid', 'name']):
+                try:
+                    if proc.info['name'] and "system" not in proc.info['name'].lower():
+                        if liberar(proc.info['pid']):
+                            total_limpos += 1
+                except Exception:
+                    continue
+            return total_limpos  # retorna número de processos tratados
+
+    elif sistema == "linux":
+        # Limpa cache global de RAM
+        uso_antes = psutil.virtual_memory().percent
+        try:
+            subprocess.run(["sync"])
+            subprocess.run(["sudo", "sh", "-c", "echo 3 > /proc/sys/vm/drop_caches"])
+            time.sleep(2)
+            uso_depois = psutil.virtual_memory().percent
+            print(f"RAM antes: {uso_antes:.2f}% | RAM depois: {uso_depois:.2f}% | Limpeza global executada")
+            return {"ram_before": uso_antes, "ram_after": uso_depois}
+        except Exception as e:
+            print(f"Erro ao liberar RAM no Linux: {e}")
+            return False
+    else:
+        print("Sistema operacional não suportado para liberar memória.")
+        return False
 
 def log_tratamento(nome, log_data, texto=None):
     log_txt = os.path.join(LOGS_LOG_DIR, f"{nome}.log")
@@ -103,37 +139,6 @@ def atualizar_cache_tratamento(nome):
     tratamento_cache[nome]["last_used"] = time.time()
     tratamento_cache[nome]["count"] += 1
 
-def liberar_ram_global():
-    if not pode_executar_tratamento("liberar_ram_global"):
-        print("⏳ liberar_ram_global só pode ser executado a cada 30 minutos.")
-        return
-    print("🔍 Iniciando tratamento: RAM Processos")
-    uso_antes = psutil.virtual_memory().percent
-    processos = psutil.process_iter(['pid', 'name'])
-    total_limpos = 0
-
-    for proc in processos:
-        try:
-            if proc.info['name'] and "system" not in proc.info['name'].lower():
-                if liberar_memoria_processo(proc.info['pid']):
-                    total_limpos += 1
-        except Exception:
-            continue
-
-    time.sleep(2)
-    uso_depois = psutil.virtual_memory().percent
-    resultado = f"RAM antes: {uso_antes:.2f}% | RAM depois: {uso_depois:.2f}% | Processos tratados: {total_limpos}"
-    print(resultado)
-    log_tratamento(
-        "log_ram",
-        {
-            "ram_before": uso_antes,
-            "ram_after": uso_depois,
-            "processes_cleaned": total_limpos
-        },
-        texto=resultado
-    )
-    atualizar_cache_tratamento("liberar_ram_global")
 
 def verificar_integridade_disco(drive="C:"):
     if not pode_executar_tratamento("verificar_integridade_disco"):
@@ -231,6 +236,7 @@ def registrar_top_processos_cpu(top_n=5):
     if not pode_executar_tratamento("registrar_top_processos_cpu"):
         print("⏳ registrar_top_processos_cpu só pode ser executado a cada 30 minutos.")
         return
+    
     print("🔍 Iniciando tratamento: Top Processos CPU")
     processos = []
     total_cpus = psutil.cpu_count(logical=True)

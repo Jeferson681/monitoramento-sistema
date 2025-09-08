@@ -1,4 +1,4 @@
-#  Arquivos Python compilados
+# Arquivos Python compilados
 __pycache__/
 *.py[cod]
 *.so
@@ -7,39 +7,50 @@ __pycache__/
 dist/
 build/
 
-#  Ambiente virtual
+# Ambiente virtual
 .venv/
 venv/
 ENV/
 
-#  Arquivos de configuração sensíveis
+# Arquivos de configuração sensíveis
 .env
 config_email.json
+config_email.yaml
+config_email.ini
+settings_secret.json
+settings_secret.yaml
+settings_secret.ini
 
-#  Dependências geradas
+# Dependências geradas
 pip-wheel-metadata/
 *.manifest
 
-#  Logs e arquivos temporários
+# Logs e arquivos temporários
 *.log
 *.tmp
 *.bak
 *.swp
+Logs/
+Logs/*.log
+Logs/json/
+Logs/json/*.jsonl
+Logs/log/
+Logs/log/*.log
 
-#  Diretórios ocultos e de sistema
+# Diretórios ocultos e de sistema
 .DS_Store
 .idea/
 .vscode/
 Thumbs.db
 
-#  Docker e banco de dados
+# Docker e banco de dados
 *.db
 *.sqlite3
 *.pid
 .dockerignore
 
-#  Testes (opcional — remova se quiser versionar)
+# Testes (opcional — remova se quiser versionar)
 tests/__pycache__/
 
 # Documentação e ideias pessoais
-docs/ideias
+.docs/ideias

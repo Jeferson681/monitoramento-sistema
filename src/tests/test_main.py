@@ -1,7 +1,7 @@
-from main import executar
 import pytest
+from main import executar
 
-# Testa execução em modo contínuo com interrupção simulada
+@pytest.mark.timeout(5)
 def test_executar_continuo_interrompido(monkeypatch, capsys):
     class Args:
         modo = "continuo"
@@ -10,8 +10,8 @@ def test_executar_continuo_interrompido(monkeypatch, capsys):
         verbose = True
         enviar = False
 
-    def fake_verificar_metricas(args):
-        print("🔁 Verificação rodada")
+    def fake_verificar_metricas(args, ciclo_atual=None):
+        print(f"🔁 Verificação rodada ciclo {ciclo_atual}")
         raise KeyboardInterrupt
 
     monkeypatch.setattr("main.verificar_metricas", fake_verificar_metricas)
@@ -20,10 +20,10 @@ def test_executar_continuo_interrompido(monkeypatch, capsys):
     executar(Args())
 
     captured = capsys.readouterr()
-    assert "🔁 Verificação rodada" in captured.out
+    assert "🔁 Verificação rodada ciclo 1" in captured.out
     assert "[INFO] Monitoramento interrompido." in captured.out
 
-# Testa execução em modo único (não contínuo)
+@pytest.mark.timeout(5)
 def test_executar_unico(monkeypatch, capsys):
     class Args:
         modo = "unico"
@@ -32,7 +32,7 @@ def test_executar_unico(monkeypatch, capsys):
         verbose = True
         enviar = False
 
-    def fake_verificar_metricas(args):
+    def fake_verificar_metricas(args, ciclo_atual=None):
         print("🔁 Verificação rodada única")
 
     monkeypatch.setattr("main.verificar_metricas", fake_verificar_metricas)
@@ -42,7 +42,7 @@ def test_executar_unico(monkeypatch, capsys):
     captured = capsys.readouterr()
     assert "🔁 Verificação rodada única" in captured.out
 
-# Testa execução em modo contínuo com número limitado de ciclos
+@pytest.mark.timeout(5)
 def test_executar_continuo_limite(monkeypatch, capsys):
     class Args:
         modo = "continuo"
@@ -54,9 +54,9 @@ def test_executar_continuo_limite(monkeypatch, capsys):
 
     chamadas = []
 
-    def fake_verificar_metricas(args):
-        print("🔁 Verificação rodada ciclo")
-        chamadas.append(1)
+    def fake_verificar_metricas(args, ciclo_atual=None):
+        print(f"🔁 Verificação rodada ciclo {ciclo_atual}")
+        chamadas.append(ciclo_atual)
 
     monkeypatch.setattr("main.verificar_metricas", fake_verificar_metricas)
     monkeypatch.setattr("time.sleep", lambda s: None)
@@ -64,5 +64,5 @@ def test_executar_continuo_limite(monkeypatch, capsys):
     executar(Args())
 
     captured = capsys.readouterr()
-    assert chamadas == [1, 1]
-    assert "Fim do Ciclo" in captured.out  # Corrigido aqui
+    assert chamadas == [1, 2]
+    assert "Fim do Ciclo" in captured.out

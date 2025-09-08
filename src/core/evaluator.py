@@ -1,8 +1,8 @@
-from src.config.settings import STATUS
-from src.core.monitor import metricas, formatar_metricas
-from src.services.logger import registrar_evento
-from src.services.utils import enviar_email_alerta
-from src.core.system import medir_ping, medir_latencia
+from config.settings import STATUS
+from core.monitor import metricas, formatar_metricas
+from services.logger import registrar_evento
+from services.utils import enviar_email_alerta
+from core.system import medir_ping, medir_latencia
 
 # 🧠 Avalia métricas e toma decisões: alerta, registro e envio de e-mails
 class EstadoSistema:
@@ -72,10 +72,10 @@ class EstadoSistema:
             registrar_evento("estavel", None, None, None, self.args, formatar_metricas(self.dados))
 
 
-def verificar_metricas(args):
+def verificar_metricas(args, ciclo_atual=None):
     dados = metricas()
     estado = EstadoSistema(dados, args)
-    print(formatar_metricas(dados))  # Exibe todas as métricas formatadas, incluindo ping e latência
+    print(formatar_metricas(dados, ciclo_atual=ciclo_atual))  # <-- passa ciclo
     estado.detectar_estado_critico()
     alerta = estado.avaliar_alerta()
     estado.avaliar_estavel(alerta)

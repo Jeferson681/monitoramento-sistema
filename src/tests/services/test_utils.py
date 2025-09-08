@@ -2,11 +2,12 @@ import os
 import pytest
 import time
 import json
+import platform
 from services.utils import (
     debug_log, pode_executar_tratamento, atualizar_cache_tratamento,
     enviar_email_alerta, liberar_memoria_processo, log_tratamento,
-    liberar_ram_global, verificar_integridade_disco, limpar_arquivos_temporarios, registrar_top_processos_cpu,
-    LOGS_JSON_DIR, LOGS_LOG_DIR
+    verificar_integridade_disco, limpar_arquivos_temporarios, registrar_top_processos_cpu,
+    LOGS_JSON_DIR, LOGS_LOG_DIR, tratamento_cache
 )
 from services.helpers import timestamp, log_verbose
 
@@ -77,26 +78,36 @@ def test_pode_executar_tratamento_e_atualizar_cache():
     assert pode_executar_tratamento(nome)
     atualizar_cache_tratamento(nome)
     assert not pode_executar_tratamento(nome)
-    time.sleep(1)
-    old_time = time.time() - 1801
-    from services import utils
-    utils.tratamento_cache[nome]["last_used"] = old_time
+    # Simula tempo antigo para liberar novamente
+    old_time = time.time() - tratamento_cache[nome]["interval"] - 1
+    tratamento_cache[nome]["last_used"] = old_time
     assert pode_executar_tratamento(nome)
 
-def test_liberar_memoria_processo_invalid_pid():
-    assert liberar_memoria_processo(-1) is False
-
-def test_liberar_ram_global(monkeypatch, capsys):
+@pytest.mark.skipif(platform.system().lower() != "windows", reason="Somente para Windows")
+def test_liberar_memoria_processo_windows(monkeypatch):
     monkeypatch.setattr("services.utils.pode_executar_tratamento", lambda n: True)
     monkeypatch.setattr("services.utils.atualizar_cache_tratamento", lambda n: None)
-    monkeypatch.setattr("psutil.virtual_memory", lambda: type("mem", (), {"percent": 50})())
     class DummyProc:
         info = {"pid": 1, "name": "python"}
     monkeypatch.setattr("psutil.process_iter", lambda attrs: [DummyProc()])
-    monkeypatch.setattr("services.utils.liberar_memoria_processo", lambda pid: True)
-    liberar_ram_global()
+    monkeypatch.setattr("ctypes.windll.kernel32.OpenProcess", lambda *a, **kw: 1)
+    monkeypatch.setattr("ctypes.windll.psapi.EmptyWorkingSet", lambda h: True)
+    monkeypatch.setattr("ctypes.windll.kernel32.CloseHandle", lambda h: True)
+    result = liberar_memoria_processo()
+    assert isinstance(result, int)
+    assert result == 1
+
+@pytest.mark.skipif(platform.system().lower() != "linux", reason="Somente para Linux")
+def test_liberar_memoria_processo_linux(monkeypatch, capsys):
+    monkeypatch.setattr("services.utils.pode_executar_tratamento", lambda n: True)
+    monkeypatch.setattr("services.utils.atualizar_cache_tratamento", lambda n: None)
+    monkeypatch.setattr("psutil.virtual_memory", lambda: type("mem", (), {"percent": 50})())
+    monkeypatch.setattr("subprocess.run", lambda *a, **kw: None)
+    result = liberar_memoria_processo()
     captured = capsys.readouterr()
-    assert "RAM antes:" in captured.out
+    assert isinstance(result, dict)
+    assert "ram_before" in result and "ram_after" in result
+    assert "Limpeza global executada" in captured.out
 
 def test_verificar_integridade_disco_windows(monkeypatch, capsys):
     monkeypatch.setattr("services.utils.pode_executar_tratamento", lambda n: True)

@@ -1,25 +1,56 @@
-# Ambientes virtuais
-.venv/
+# Arquivos Python compilados
 __pycache__/
-*.pyc
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Ambiente virtual
+.venv/
+venv/
+ENV/
 
 # Arquivos de configuração sensíveis
 .env
 config_email.json
+config_email.yaml
+config_email.ini
+settings_secret.json
+settings_secret.yaml
+settings_secret.ini
 
-# Logs
+# Dependências geradas
+pip-wheel-metadata/
+*.manifest
+
+# Logs e arquivos temporários
 *.log
-monitoramento.log
-
-# Arquivos temporários e de sistema
-*.swp
-*.bak
 *.tmp
+*.bak
+*.swp
+Logs/
+Logs/*.log
+Logs/json/
+Logs/json/*.jsonl
+Logs/log/
+Logs/log/*.log
+
+# Diretórios ocultos e de sistema
 .DS_Store
+.idea/
+.vscode/
 Thumbs.db
 
-# Testes (se não quiser incluir na imagem final)
-tests/
+# Docker e banco de dados
+*.db
+*.sqlite3
+*.pid
+.dockerignore
+
+# Testes (opcional — remova se quiser versionar)
+tests/__pycache__/
 
 # Documentação e ideias pessoais
-docs/ideias
+.docs/ideias

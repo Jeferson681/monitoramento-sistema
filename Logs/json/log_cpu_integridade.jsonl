@@ -1,33 +1,6 @@
-{"status": "PROBLEMAS", "problems": ["Acesso negado, pois vocÛ nÒo tem privilÚgios suficientes ou\no disco pode estar bloqueado por outro processo.\nInvoque este utilitßrio durante a execuþÒo em modo privilegiado\ne verifique se o disco estß desbloqueado.\n"], "instructions": "Execute 'chkdsk /f' como administrador para tentar corrigir automaticamente.", "timestamp": "2025-09-06 23:27:23"}
-{"status": "PROBLEMAS", "problems": ["Acesso negado, pois vocÛ nÒo tem privilÚgios suficientes ou\no disco pode estar bloqueado por outro processo.\nInvoque este utilitßrio durante a execuþÒo em modo privilegiado\ne verifique se o disco estß desbloqueado.\n"], "instructions": "Execute 'chkdsk /f' como administrador para tentar corrigir automaticamente.", "timestamp": "2025-09-06 23:32:57"}
-{"status": "PROBLEMAS", "problems": ["Acesso negado, pois vocÛ nÒo tem privilÚgios suficientes ou\no disco pode estar bloqueado por outro processo.\nInvoque este utilitßrio durante a execuþÒo em modo privilegiado\ne verifique se o disco estß desbloqueado.\n"], "instructions": "Execute 'chkdsk /f' como administrador para tentar corrigir automaticamente.", "timestamp": "2025-09-06 23:35:04"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 13:42:35"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 13:42:35"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 13:42:35"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 13:46:36"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 13:46:36"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 13:46:36"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:17:10"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:17:10"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 16:17:10"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:20:13"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:20:13"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 16:20:13"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:29:59"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:29:59"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 16:29:59"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:31:55"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:31:55"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 16:31:55"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:34:25"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 16:34:25"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 16:34:25"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 17:59:48"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 17:59:48"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 17:59:48"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 18:08:10"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 18:08:10"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 18:08:10"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 18:09:15"}
-{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 18:09:15"}
-{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 18:09:15"}
+{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 22:17:03"}
+{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 22:17:03"}
+{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 22:17:03"}
+{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 22:19:02"}
+{"status": "OK", "problems": [], "instructions": "", "timestamp": "2025-09-07 22:19:02"}
+{"status": "ERRO", "problems": ["erro"], "instructions": "", "timestamp": "2025-09-07 22:19:02"}

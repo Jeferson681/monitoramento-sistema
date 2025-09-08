@@ -2,12 +2,10 @@ import os
 import subprocess
 import platform
 import time
-import socket
 import re
 from pathlib import Path
 import psutil
-import shutil
-from src.services.utils import debug_log
+from services.utils import debug_log
 
 # Caminho do script externo para leitura de sensores (Linux)
 SCRIPT_PATH = Path(__file__).parent / "script" / "lm_sensors.sh"

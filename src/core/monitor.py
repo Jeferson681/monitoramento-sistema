@@ -1,5 +1,7 @@
 import psutil
-from src.core.system import (
+from core import args
+from core.args import parse_args
+from core.system import (
     obter_disco_principal,
     ler_temperaturas_bash,
     medir_ping,
@@ -52,7 +54,7 @@ def format_bytes(n):
         n /= 1024.0
     return f"{n:.1f} PB"
 
-def formatar_metricas(dados, para_email=False):
+def formatar_metricas(dados, para_email=False, ciclo_atual=None):
     def safe_float(valor, default=0.0):
         try:
             return float(valor)
@@ -79,8 +81,12 @@ def formatar_metricas(dados, para_email=False):
         f"Latência TCP: {safe_str(dados.get('latencia_tcp_ms'))} ms\n"
         f"Rede: {format_bytes(safe_float(dados.get('rede_bytes_enviados')))} enviados / "
         f"{format_bytes(safe_float(dados.get('rede_bytes_recebidos')))} recebidos\n"
-        f"-------------------------------------------------------------------"
-    )
+        
+    )   
+    if ciclo_atual is not None:
+        texto += f"Ciclo: {ciclo_atual}\n"
+    elif parse_args().modo == "unico":
+        texto += "-------------------------------------------\n"
 
     if para_email:
         return f"📊 MÉTRICAS ({dados.get('timestamp', '')})\n{texto}"

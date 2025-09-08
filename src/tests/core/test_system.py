@@ -1,9 +1,8 @@
-import time
-import psutil
-import subprocess
-import os
+import platform
+import pytest
 from unittest.mock import patch, MagicMock
-from src.core.system import (
+
+from core.system import (
     medir_cpu,
     medir_memoria,
     obter_disco_principal,
@@ -12,7 +11,7 @@ from src.core.system import (
     medir_latencia,
     medir_rede,
 )
-from src.core import system
+from core import system
 
 # Testa medir_cpu com cache
 @patch("psutil.cpu_percent", return_value=50.0)
@@ -49,14 +48,15 @@ def test_medir_memoria(mock_virtual_memory):
     mock_virtual_memory.assert_called_once()  # Não deve chamar novamente
 
 # Testa obter_disco_principal com cache
-@patch("src.core.system.os.environ.get", return_value="C:\\")
+@pytest.mark.skipif(platform.system().lower() != "windows", reason="Somente para Windows")
+@patch("core.system.os.environ.get", return_value="C:\\")
 @patch("psutil.disk_usage")
-def test_obter_disco_principal(mock_disk_usage, mock_environ_get):
+def test_obter_disco_principal_windows(mock_disk_usage, mock_environ_get):
     mock_disk_usage.return_value = MagicMock(
         total=1000, used=500, free=500, percent=50.0
     )
     # Limpa o cache para garantir que o mock será usado
-    import src.core.system as system
+    import core.system as system
     system.cache["disk"]["last_updated"] = 0
 
     disco = obter_disco_principal()
@@ -66,6 +66,28 @@ def test_obter_disco_principal(mock_disk_usage, mock_environ_get):
     assert disco["data"]["percent"] == 50.0
     assert "timestamp" in disco
     mock_environ_get.assert_called()
+
+    # Segunda chamada (usa o cache)
+    disco_cached = obter_disco_principal()
+    assert disco_cached == disco
+    # Não precisa verificar mock_environ_get novamente
+
+@pytest.mark.skipif(platform.system().lower() != "linux", reason="Somente para Linux")
+@patch("psutil.disk_usage")
+def test_obter_disco_principal_linux(mock_disk_usage):
+    mock_disk_usage.return_value = MagicMock(
+        total=1000, used=400, free=600, percent=40.0
+    )
+    # Limpa o cache para garantir que o mock será usado
+    import core.system as system
+    system.cache["disk"]["last_updated"] = 0
+
+    disco = obter_disco_principal()
+    assert disco["data"]["total"] == 1000
+    assert disco["data"]["used"] == 400
+    assert disco["data"]["free"] == 600
+    assert disco["data"]["percent"] == 40.0
+    assert "timestamp" in disco
 
     # Segunda chamada (usa o cache)
     disco_cached = obter_disco_principal()

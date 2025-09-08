@@ -1,8 +1,8 @@
 import time
 
-from src.core.args import parse_args
-from src.core.evaluator import verificar_metricas
-from src.services.helpers import log_verbose
+from core.args import parse_args
+from core.evaluator import verificar_metricas
+from services.helpers import log_verbose
 
 
 #  Executa o monitoramento conforme o modo escolhido
@@ -12,8 +12,8 @@ def executar(args):
         try:
             while True:
                 log_verbose(f"Iniciando monitoramento com intervalo {getattr(args, 'loop', 1)}s", args.verbose)
-                verificar_metricas(args)
                 contador += 1
+                verificar_metricas(args, ciclo_atual=contador)
                 if getattr(args, 'ciclos', None) is not None and args.ciclos > 0 and contador >= args.ciclos:
                     break
                 time.sleep(getattr(args, 'loop', 1))

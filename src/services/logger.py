@@ -1,10 +1,10 @@
 import os
 import json
 from datetime import datetime
-from src.config.settings import DATE_STR
-from src.core.monitor import formatar_metricas, metricas
-from src.services.helpers import log_verbose, timestamp
-from src.services.utils import enviar_email_alerta
+from config.settings import DATE_STR
+from core.monitor import formatar_metricas, metricas
+from services.helpers import log_verbose, timestamp
+from services.utils import enviar_email_alerta
 
 
 # Absolute path to the project root

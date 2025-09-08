@@ -1,4 +1,4 @@
-from src.core.evaluator import verificar_metricas, EstadoSistema
+from core.evaluator import verificar_metricas, EstadoSistema
 from unittest.mock import patch
 import pytest
 
@@ -20,9 +20,9 @@ class ArgsFake:
 def estado_sistema():
     return EstadoSistema(DADOS_FAKE, ArgsFake())
 
-@patch("src.core.evaluator.metricas", return_value=DADOS_FAKE)
-@patch("src.core.evaluator.registrar_evento")
-@patch("src.core.evaluator.enviar_email_alerta")
+@patch("core.evaluator.metricas", return_value=DADOS_FAKE)
+@patch("core.evaluator.registrar_evento")
+@patch("core.evaluator.enviar_email_alerta")
 def test_verificar_metricas(mock_enviar_email, mock_registrar_evento, mock_metricas, capsys):
     verificar_metricas(ArgsFake())
     captured = capsys.readouterr()
@@ -30,15 +30,15 @@ def test_verificar_metricas(mock_enviar_email, mock_registrar_evento, mock_metri
     assert mock_registrar_evento.call_count >= 1
     assert mock_enviar_email.call_count >= 1
 
-@patch("src.core.evaluator.registrar_evento")
-@patch("src.core.evaluator.enviar_email_alerta")
+@patch("core.evaluator.registrar_evento")
+@patch("core.evaluator.enviar_email_alerta")
 def test_detectar_estado_critico(mock_enviar_email, mock_registrar_evento, estado_sistema):
     estado_sistema.detectar_estado_critico()
     assert estado_sistema.estado_critico is True
     assert estado_sistema.comp_disparo == "memoria_percent"
     assert mock_enviar_email.call_count == 1
 
-@patch("src.core.evaluator.registrar_evento")
+@patch("core.evaluator.registrar_evento")
 def test_avaliar_alerta(mock_registrar_evento, estado_sistema):
     estado_sistema.avaliar_alerta()
     assert mock_registrar_evento.call_count == 1
@@ -46,7 +46,7 @@ def test_avaliar_alerta(mock_registrar_evento, estado_sistema):
         "alerta", "memoria_percent", 95, 95, estado_sistema.args, estado_sistema.snapshot_inicial
     )
 
-@patch("src.core.evaluator.registrar_evento")
+@patch("core.evaluator.registrar_evento")
 def test_avaliar_estavel(mock_registrar_evento, estado_sistema):
     estado_sistema.houve_critico = False
     estado_sistema.avaliar_estavel(False)
