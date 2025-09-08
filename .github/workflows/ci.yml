@@ -11,10 +11,11 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Scan de segredos com GitGuardian
-        uses: GitGuardian/ggshield-action@v1
-        with:
-          args: scan repo --all
+      - name: Instalar ggshield
+        run: pip install --upgrade ggshield
+
+      - name: Run ggshield secret scan
+        run: ggshield secret scan repo .
 
   test:
     runs-on: ${{ matrix.os }}
@@ -36,6 +37,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install --no-cache-dir -r requirements.txt
           pip install pytest pytest-cov pytest-timeout
+
+      - name: Instalar dependências (Linux/Mac)
+        if: runner.os != 'Windows'
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir -r requirements.txt
+
+      - name: Instalar dependências (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir -r requirements.txt
+          pip install pywin32 WMI
 
       - name: Ajustar PYTHONPATH (Windows)
         if: runner.os == 'Windows'
