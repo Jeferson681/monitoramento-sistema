@@ -1,19 +1,19 @@
-# 1. Imagem base
+# Imagem base
 FROM python:3.10.9-slim
 
-# 2. Diretório de trabalho no container
+# Diretório de trabalho
 WORKDIR /app
 
-# 3. Copiar os arquivos de dependência primeiro
+# Copia dependências e instala
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 4. Instalar pacotes de desenvolvimento
-RUN pip install pytest python-dotenv
-
-# 5. Copiar o restante do projeto
+# Copia o restante do projeto
 COPY . .
 
-# 6. Comando padrão
-ENTRYPOINT ["python", "main.py"]
+# Adiciona instruções de uso ao Dockerfile
+LABEL org.opencontainers.image.description="Monitoramento de Sistema: execute 'python src/main.py --help' para instruções."
+
+# Comando padrão para execução contínua
+ENTRYPOINT ["python", "src/main.py"]
 CMD ["--modo", "continuo", "--loop", "30"]

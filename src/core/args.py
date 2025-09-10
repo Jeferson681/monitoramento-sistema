@@ -1,4 +1,3 @@
-
 """
 Argumentos de linha de comando para o sistema de monitoramento.
 Permite configurar modo de execução, intervalo, ciclos, destino de log, verbosidade e envio de e-mail.
@@ -8,7 +7,19 @@ import argparse
 import os
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Monitoramento do sistema")
+    parser = argparse.ArgumentParser(
+        description="Monitoramento do sistema",
+        epilog="""
+Exemplos de uso:
+  python src/main.py --help
+  python src/main.py --modo continuo --loop 10 --ciclos 20
+  python src/main.py --modo unico --log console --verbose
+
+No Docker:
+  docker run --rm seu-usuario/monitoramento-sistema --help
+  docker run --rm seu-usuario/monitoramento-sistema --modo continuo --loop 10 --ciclos 20
+        """
+    )
 
     # Modo de execução: único ou contínuo
     parser.add_argument(
