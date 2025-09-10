@@ -1,3 +1,7 @@
+"""
+Módulo para coleta de métricas do sistema: CPU, memória, disco, temperatura, ping e rede.
+Utiliza cache para otimizar chamadas e scripts externos para sensores em Linux.
+"""
 import os
 import subprocess
 import platform
@@ -5,12 +9,9 @@ import time
 import re
 from pathlib import Path
 import psutil
+
 from services.utils import debug_log
-
-# Caminho do script externo para leitura de sensores (Linux)
 SCRIPT_PATH = Path(__file__).parent / "script" / "lm_sensors.sh"
-
-# Cache para armazenar os dados coletados e os timestamps
 cache = {
     "cpu": {"data": None, "last_updated": 0, "interval": 10},
     "memory": {"data": None, "last_updated": 0, "interval": 10},
@@ -21,13 +22,17 @@ cache = {
     "network": {"data": None, "last_updated": 0, "interval": 15},
 }
 
-# Função auxiliar para verificar se o intervalo foi ultrapassado
 def _should_update(key):
+    """
+    Retorna True se o intervalo de atualização da métrica expirou.
+    """
     current_time = time.time()
     return current_time - cache[key]["last_updated"] >= cache[key]["interval"]
 
-# CPU: Coleta o uso total da CPU
 def medir_cpu():
+    """
+    Retorna o uso total da CPU (%), com cache.
+    """
     if _should_update("cpu"):
         cache["cpu"]["data"] = psutil.cpu_percent(interval=None)
         cache["cpu"]["last_updated"] = time.time()
@@ -36,8 +41,10 @@ def medir_cpu():
         "timestamp": cache["cpu"]["last_updated"]
     }
 
-# Memória RAM: Coleta informações sobre a memória
 def medir_memoria():
+    """
+    Retorna informações da memória RAM (total, usada, %), com cache.
+    """
     if _should_update("memory"):
         mem = psutil.virtual_memory()
         cache["memory"]["data"] = {
@@ -52,6 +59,9 @@ def medir_memoria():
     }
 
 def obter_disco_principal():
+    """
+    Retorna informações do disco principal do sistema (Windows/Linux), com cache.
+    """
     if _should_update("disk"):
         system_name = platform.system().lower()
         debug_log(f"[DEBUG] platform.system().lower(): {system_name}")
@@ -73,8 +83,11 @@ def obter_disco_principal():
         "timestamp": cache["disk"]["last_updated"]
     }
 
-# Temperatura: Coleta temperaturas de CPU, placa-mãe e GPU via script bash (Linux)
 def ler_temperaturas_bash():
+    """
+    Coleta temperaturas de CPU, placa-mãe e GPU via script bash (Linux).
+    Retorna dicionário vazio em caso de erro. Usa cache.
+    """
     if _should_update("temperature"):
         try:
             resultado = subprocess.run(
@@ -100,9 +113,10 @@ def ler_temperaturas_bash():
         "timestamp": cache["temperature"]["last_updated"]
     }
 
-# Ping: Mede o tempo de resposta (ping)
-
 def medir_ping(host="8.8.8.8", count=4, timeout=2000):
+    """
+    Mede o tempo de resposta (ping) para um host (Windows/Linux), com cache.
+    """
     if _should_update("ping"):
         latencias = []
         sistema = platform.system().lower()
@@ -136,6 +150,9 @@ def medir_ping(host="8.8.8.8", count=4, timeout=2000):
     }
 
 def medir_latencia(host="8.8.8.8", count=4, timeout=2000):
+    """
+    Mede a latência de rede para um host (Windows/Linux), com cache.
+    """
     if _should_update("latency"):
         latencias = []
         sistema = platform.system().lower()
@@ -168,8 +185,10 @@ def medir_latencia(host="8.8.8.8", count=4, timeout=2000):
         "timestamp": cache["latency"]["last_updated"]
     }
 
-# Rede: Coleta informações sobre bytes enviados e recebidos
 def medir_rede():
+    """
+    Retorna bytes enviados/recebidos pela rede, com cache.
+    """
     if _should_update("network"):
         net = psutil.net_io_counters()
         cache["network"]["data"] = {

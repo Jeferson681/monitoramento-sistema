@@ -1,53 +1,59 @@
+
+"""
+Argumentos de linha de comando para o sistema de monitoramento.
+Permite configurar modo de execução, intervalo, ciclos, destino de log, verbosidade e envio de e-mail.
+Valores padrão podem ser definidos via variáveis de ambiente ou .env.
+"""
 import argparse
 import os
 
-# 🔧 Função que define os argumentos de execução do sistema
 def parse_args():
     parser = argparse.ArgumentParser(description="Monitoramento do sistema")
 
-    # --modo: define se roda uma vez ou em loop contínuo
+    # Modo de execução: único ou contínuo
     parser.add_argument(
         "--modo",
         choices=["unico", "continuo"],
-        default=os.getenv("MODO_PADRAO", "unico"),  # pode vir do .env
-        help="Modo de execução"
+        default=os.getenv("MODO_PADRAO", "unico"),
+        help="Modo de execução: 'unico' (uma vez) ou 'continuo' (loop infinito)"
     )
 
-    # --loop: intervalo entre execuções no modo contínuo
+    # Intervalo entre execuções no modo contínuo (segundos)
     parser.add_argument(
         "--loop",
         type=int,
-        default=int(os.getenv("LOOP_SECONDS", "30")),  # pode vir do .env
-        help="Intervalo em segundos no modo continuo"
+        default=int(os.getenv("LOOP_SECONDS", "30")),
+        help="Intervalo entre execuções no modo contínuo (segundos)"
     )
-    # --ciclos: número de execuções antes de encerrar (modo contínuo)
+
+    # Número de ciclos antes de encerrar (apenas modo contínuo)
     parser.add_argument(
         "--ciclos",
         type=int,
-        default=None,  # None = infinito
-        help="Número de ciclos no modo continuo (None = infinito)"
+        default=None,
+        help="Número de ciclos no modo contínuo (None = infinito)"
     )
 
-    # --log: define onde os logs vão aparecer (console ou arquivo)
+    # Destino dos logs: console ou arquivo
     parser.add_argument(
         "--log",
         choices=["console", "arquivo"],
-        default=os.getenv("DESTINO_LOG", "arquivo"),  # padrão agora é "arquivo"
-        help="Destino do log"
+        default=os.getenv("DESTINO_LOG", "arquivo"),
+        help="Destino dos logs: 'console' ou 'arquivo'"
     )
 
-    # --verbose: ativa logs detalhados
+    # Ativa logs detalhados (verbose)
     parser.add_argument(
         "--verbose",
         action="store_true",
-        help="Ativa logs verbosos"
+        help="Ativa logs detalhados (verbose)"
     )
 
-    # --enviar: ativa envio de e-mail em caso de evento
+    # Ativa envio de e-mail em caso de evento
     parser.add_argument(
         "--enviar",
         action="store_true",
-        help="Envia e-mail quando há evento"
+        help="Envia e-mail quando há evento crítico ou alerta"
     )
 
     return parser.parse_known_args()[0]

@@ -6,6 +6,10 @@ from services.helpers import log_verbose
 
 
 #  Executa o monitoramento conforme o modo escolhido
+"""
+Executa o monitoramento conforme o modo escolhido.
+Gerencia modo contínuo e único, controle de ciclos e interrupções.
+"""
 def executar(args):
     if args.modo == "continuo":
         contador = 0
@@ -19,7 +23,6 @@ def executar(args):
                 time.sleep(getattr(args, 'loop', 1))
         except KeyboardInterrupt:
             print("\n[INFO] Monitoramento interrompido.")
-        # "Fim do Ciclo" só será exibido se o loop terminar normalmente (não por KeyboardInterrupt)
         else:
             print("Fim do Ciclo")
     else:
@@ -27,5 +30,9 @@ def executar(args):
 
 
 #  Ponto de entrada do sistema
+"""
+Ponto de entrada do sistema.
+"""
 if __name__ == "__main__":
-    executar(parse_args())
+    args = parse_args()
+    executar(args)

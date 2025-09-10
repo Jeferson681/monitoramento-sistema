@@ -1,3 +1,6 @@
+"""
+Funções de coleta e formatação de métricas do sistema.
+"""
 import psutil
 from core import args
 from core.args import parse_args
@@ -9,8 +12,22 @@ from core.system import (
 )
 import datetime
 
+
+def format_bytes(n):
+    """
+    Converte número de bytes em string legível (ex: '1.5 GB').
+    """
+    for unidade in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if n < 1024.0:
+            return f"{n:.1f} {unidade}"
+        n /= 1024.0
+    return f"{n:.1f} PB"
+
 def metricas():
-    """Coleta métricas do sistema em tempo real."""
+    """
+    Coleta métricas do sistema em tempo real, incluindo CPU, memória, disco, rede, temperaturas, ping e latência.
+    Retorna dicionário padronizado para uso no monitoramento.
+    """
     memoria = psutil.virtual_memory()
     disco_principal = obter_disco_principal()
     mountpoint = disco_principal.get("mountpoint", "/") if isinstance(disco_principal, dict) else disco_principal
@@ -46,20 +63,16 @@ def metricas():
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
-def format_bytes(n):
-    """Formata um número de bytes em uma string legível (ex: '1.5 GB')."""
-    for unidade in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-        if n < 1024.0:
-            return f"{n:.1f} {unidade}"
-        n /= 1024.0
-    return f"{n:.1f} PB"
-
 def formatar_metricas(dados, para_email=False, ciclo_atual=None):
+    """
+    Formata o dicionário de métricas para exibição ou envio por e-mail.
+    Inclui ciclo atual e separador para modo único.
+    """
     def safe_float(valor, default=0.0):
         try:
-            return float(valor)
-        except (TypeError, ValueError):
-            return default
+            return float(str(valor).replace(',', '.'))
+        except Exception:
+            return 0.0
 
     def safe_str(valor, default="Indisponível"):
         if valor is None or isinstance(valor, dict):
@@ -81,8 +94,7 @@ def formatar_metricas(dados, para_email=False, ciclo_atual=None):
         f"Latência TCP: {safe_str(dados.get('latencia_tcp_ms'))} ms\n"
         f"Rede: {format_bytes(safe_float(dados.get('rede_bytes_enviados')))} enviados / "
         f"{format_bytes(safe_float(dados.get('rede_bytes_recebidos')))} recebidos\n"
-        
-    )   
+    )
     if ciclo_atual is not None:
         texto += f"Ciclo: {ciclo_atual}\n"
     elif parse_args().modo == "unico":

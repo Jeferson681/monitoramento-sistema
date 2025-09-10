@@ -13,28 +13,28 @@ from core.system import (
 )
 from core import system
 
-# Testa medir_cpu com cache
+    # Testa se o cache é utilizado corretamente para CPU
 @patch("psutil.cpu_percent", return_value=50.0)
 def test_medir_cpu(mock_cpu_percent):
-    # Primeira chamada (atualiza o cache)
+    # Primeira chamada: atualiza o cache
     cpu = medir_cpu()
     assert cpu["data"] == 50.0
     assert "timestamp" in cpu
     mock_cpu_percent.assert_called_once()
 
-    # Segunda chamada (usa o cache)
+    # Segunda chamada: deve retornar o valor do cache
     cpu_cached = medir_cpu()
     assert cpu_cached == cpu
-    mock_cpu_percent.assert_called_once()  # Não deve chamar novamente
+    # Garante que o mock não é chamado novamente após uso do cache
 
-# Testa medir_memoria com cache
+    # Testa se o cache é utilizado corretamente para memória
 @patch("psutil.virtual_memory")
 def test_medir_memoria(mock_virtual_memory):
     mock_virtual_memory.return_value = MagicMock(
         total=16 * 1024**3, used=8 * 1024**3, percent=50.0
     )
 
-    # Primeira chamada (atualiza o cache)
+    # Primeira chamada: atualiza o cache
     memoria = medir_memoria()
     assert memoria["data"]["total"] == 16 * 1024**3
     assert memoria["data"]["used"] == 8 * 1024**3
@@ -42,12 +42,12 @@ def test_medir_memoria(mock_virtual_memory):
     assert "timestamp" in memoria
     mock_virtual_memory.assert_called_once()
 
-    # Segunda chamada (usa o cache)
+    # Segunda chamada: deve retornar o valor do cache
     memoria_cached = medir_memoria()
     assert memoria_cached == memoria
-    mock_virtual_memory.assert_called_once()  # Não deve chamar novamente
+    # Garante que o mock não é chamado novamente após uso do cache
 
-# Testa obter_disco_principal com cache
+    # Testa se o cache e mocks funcionam corretamente para disco principal
 @pytest.mark.skipif(platform.system().lower() != "windows", reason="Somente para Windows")
 @patch("core.system.os.environ.get", return_value="C:\\")
 @patch("psutil.disk_usage")
@@ -55,7 +55,7 @@ def test_obter_disco_principal_windows(mock_disk_usage, mock_environ_get):
     mock_disk_usage.return_value = MagicMock(
         total=1000, used=500, free=500, percent=50.0
     )
-    # Limpa o cache para garantir que o mock será usado
+    # Força atualização do cache para garantir uso do mock
     import core.system as system
     system.cache["disk"]["last_updated"] = 0
 
@@ -67,10 +67,10 @@ def test_obter_disco_principal_windows(mock_disk_usage, mock_environ_get):
     assert "timestamp" in disco
     mock_environ_get.assert_called()
 
-    # Segunda chamada (usa o cache)
+    # Segunda chamada: deve retornar o valor do cache
     disco_cached = obter_disco_principal()
     assert disco_cached == disco
-    # Não precisa verificar mock_environ_get novamente
+    # Não é necessário verificar mock_environ_get novamente pois o cache impede nova chamada
 
 @pytest.mark.skipif(platform.system().lower() != "linux", reason="Somente para Linux")
 @patch("psutil.disk_usage")

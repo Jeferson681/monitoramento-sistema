@@ -1,12 +1,14 @@
+import sys
+import pytest
 from core.args import parse_args
 
-# ✅ Testa se os valores padrão são aplicados quando nenhum argumento é passado
+@pytest.mark.skipif(sys.platform not in ["win32", "linux"], reason="Compatível apenas com Windows e Linux")
 def test_parse_args_default(monkeypatch):
-    # Simula execução sem argumentos (como se fosse: python main.py)
+    # Simula execução sem argumentos para garantir valores default
     monkeypatch.setattr("sys.argv", ["main.py"])
     args = parse_args()
 
-    # Verifica se os valores padrão foram aplicados corretamente
+    # Verifica se todos os valores default estão corretos
     assert args.modo == "unico"
     assert args.loop == 30
     assert args.ciclos is None
@@ -14,6 +16,7 @@ def test_parse_args_default(monkeypatch):
     assert args.verbose is False
     assert args.enviar is False
 
+@pytest.mark.skipif(sys.platform not in ["win32", "linux"], reason="Compatível apenas com Windows e Linux")
 def test_parse_args_custom(monkeypatch):
     monkeypatch.setattr(
         "sys.argv",

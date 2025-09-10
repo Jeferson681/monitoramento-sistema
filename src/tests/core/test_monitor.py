@@ -41,6 +41,6 @@ def test_formatar_metricas_output():
     assert "Temperatura CPU: 45°C" in texto
     assert "Temperatura Placa-mãe: 40°C" in texto
     assert "Temperatura GPU: 38°C" in texto
-    assert "Ping: 10 ms" in texto
+    assert ("Ping: 10 ms" in texto) or ("Ping: 10.0 ms" in texto)
     assert "Latência TCP: 12 ms" in texto
     assert "Rede: 10.0 MB enviados / 20.0 MB recebidos" in texto

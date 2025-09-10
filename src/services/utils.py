@@ -11,8 +11,14 @@ import subprocess
 import platform
 import json
 from services.helpers import timestamp, log_verbose
+from config.settings import DATE_STR
 
-# Caminhos de logs padronizados (igual logger.py)
+"""
+Funções de tratamento e utilidades do monitoramento:
+ - Limpeza de RAM, disco, integridade, logs
+ - Envio de e-mail de alerta
+Todas funções respeitam intervalos mínimos de execução para evitar sobrecarga.
+"""
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 LOGS_DIR = os.path.join(PROJECT_ROOT, "Logs")
 LOGS_JSON_DIR = os.path.join(LOGS_DIR, "json")
@@ -21,6 +27,9 @@ os.makedirs(LOGS_JSON_DIR, exist_ok=True)
 os.makedirs(LOGS_LOG_DIR, exist_ok=True)
 
 def enviar_email_alerta(mensagem):
+    """
+    Envia alerta por e-mail usando configurações do ambiente.
+    """
     if not mensagem:
         print("⚠️ Nenhuma mensagem para enviar.")
         return
@@ -51,19 +60,29 @@ def enviar_email_alerta(mensagem):
         print(f"Falha ao enviar e-mail: {e}")
 
 def debug_log(msg, arquivo=None):
+    """
+    Registra mensagem de depuração em arquivo texto.
+    """
     arquivo = arquivo or "debug.log"
     with open(arquivo, "a", encoding="utf-8") as f:
         f.write(msg + "\n")
 
 def liberar_memoria_processo(pid=None):
+    """
+    Libera memória RAM de processos (Windows/Linux), respeitando intervalo de execução.
+    Exibe os processos que mais liberaram memória e registra log.
+    """
     if not pode_executar_tratamento("liberar_ram_global"):
         print("⏳ liberar_memoria_processo só pode ser executado a cada 30 minutos.")
         return False
+    print("🔍 Iniciando tratamento: Liberação de Memória")
     sistema = platform.system().lower()
+    processos_liberados = []
     if sistema == "windows":
-        # Libera memória de um processo específico ou de todos se pid for None
         def liberar(pid):
             try:
+                proc = psutil.Process(pid)
+                uso_antes = proc.memory_info().rss / (1024 * 1024)
                 PROCESS_SET_QUOTA = 0x0100
                 PROCESS_QUERY_INFORMATION = 0x0400
                 PROCESS_VM_READ = 0x0010
@@ -75,33 +94,75 @@ def liberar_memoria_processo(pid=None):
                 if handle:
                     ctypes.windll.psapi.EmptyWorkingSet(handle)
                     ctypes.windll.kernel32.CloseHandle(handle)
-                    return True
+                    uso_depois = proc.memory_info().rss / (1024 * 1024)
+                    return proc.name(), uso_antes, uso_depois
             except Exception:
                 pass
-            return False
+            return None
 
         if pid is not None:
-            return liberar(pid)
+            resultado = liberar(pid)
+            if resultado:
+                nome, antes, depois = resultado
+                processos_liberados.append({
+                    "pid": pid,
+                    "name": nome,
+                    "mem_before_mb": antes,
+                    "mem_after_mb": depois
+                })
         else:
-            total_limpos = 0
             for proc in psutil.process_iter(['pid', 'name']):
                 try:
                     if proc.info['name'] and "system" not in proc.info['name'].lower():
-                        if liberar(proc.info['pid']):
-                            total_limpos += 1
+                        resultado = liberar(proc.info['pid'])
+                        if resultado:
+                            nome, antes, depois = resultado
+                            processos_liberados.append({
+                                "pid": proc.info['pid'],
+                                "name": nome,
+                                "mem_before_mb": antes,
+                                "mem_after_mb": depois
+                            })
                 except Exception:
                     continue
-            return total_limpos  # retorna número de processos tratados
+
+        # Ordena pelos que mais liberaram memória
+        processos_liberados.sort(key=lambda p: p['mem_before_mb'] - p['mem_after_mb'], reverse=True)
+        top5 = processos_liberados[:5]
+        total_liberado = sum(p['mem_before_mb'] - p['mem_after_mb'] for p in top5)
+        print(f"✅ Fim do tratamento: {len(top5)} processos relevantes. Total liberado (top 5): {total_liberado:.2f} MB")
+        print("Prévia dos 2 processos que mais liberaram RAM:")
+        for p in top5[:2]:
+            liberado = p['mem_before_mb'] - p['mem_after_mb']
+            print(f"{p['name']} liberado: {liberado:.2f} MB")
+        texto_log = "\n".join([
+            f"PID {p['pid']} | {p['name']} | RAM antes: {p['mem_before_mb']:.2f} MB | RAM depois: {p['mem_after_mb']:.2f} MB | Liberado: {(p['mem_before_mb'] - p['mem_after_mb']):.2f} MB"
+            for p in top5
+        ])
+        texto_log = f"Total liberado (top 5): {total_liberado:.2f} MB\n" + texto_log
+        log_tratamento(
+            "log_liberar_memoria_processo",
+            {"processos_liberados": top5, "total_liberado_mb": total_liberado},
+            texto=texto_log
+        )
+        atualizar_cache_tratamento("liberar_ram_global")
+        return len(processos_liberados)
 
     elif sistema == "linux":
-        # Limpa cache global de RAM
         uso_antes = psutil.virtual_memory().percent
         try:
             subprocess.run(["sync"])
             subprocess.run(["sudo", "sh", "-c", "echo 3 > /proc/sys/vm/drop_caches"])
             time.sleep(2)
             uso_depois = psutil.virtual_memory().percent
-            print(f"RAM antes: {uso_antes:.2f}% | RAM depois: {uso_depois:.2f}% | Limpeza global executada")
+            texto = f"RAM antes: {uso_antes:.2f}% | RAM depois: {uso_depois:.2f}% | Limpeza global executada"
+            print(texto)
+            log_tratamento(
+                "log_liberar_memoria_processo",
+                {"ram_before": uso_antes, "ram_after": uso_depois},
+                texto=texto
+            )
+            atualizar_cache_tratamento("liberar_ram_global")
             return {"ram_before": uso_antes, "ram_after": uso_depois}
         except Exception as e:
             print(f"Erro ao liberar RAM no Linux: {e}")
@@ -111,8 +172,11 @@ def liberar_memoria_processo(pid=None):
         return False
 
 def log_tratamento(nome, log_data, texto=None):
-    log_txt = os.path.join(LOGS_LOG_DIR, f"{nome}.log")
-    log_json = os.path.join(LOGS_JSON_DIR, f"{nome}.jsonl")
+    """
+    Registra dados de tratamento em arquivos de log texto e JSONL.
+    """
+    log_txt = os.path.join(LOGS_LOG_DIR, f"{nome}_{DATE_STR}.log")
+    log_json = os.path.join(LOGS_JSON_DIR, f"{nome}_{DATE_STR}.jsonl")
     timestamp_str = timestamp()
 
     if texto:
@@ -131,16 +195,26 @@ tratamento_cache = {
 }
 
 def pode_executar_tratamento(nome):
+    """
+    Verifica se o tratamento pode ser executado (intervalo respeitado).
+    """
     now = time.time()
     info = tratamento_cache[nome]
     return (now - info["last_used"]) >= info["interval"]
 
 def atualizar_cache_tratamento(nome):
+    """
+    Atualiza cache de execução do tratamento.
+    """
     tratamento_cache[nome]["last_used"] = time.time()
     tratamento_cache[nome]["count"] += 1
 
 
 def verificar_integridade_disco(drive="C:"):
+    """
+    Verifica integridade do disco (Windows/Linux), respeitando intervalo de execução.
+    Registra problemas e instruções no log.
+    """
     if not pode_executar_tratamento("verificar_integridade_disco"):
         print("⏳ verificar_integridade_disco só pode ser executado a cada 12 horas.")
         return
@@ -187,7 +261,7 @@ def verificar_integridade_disco(drive="C:"):
         problemas.append(str(e))
 
     resultado = f"Status: {status} | Instruções: {instrucoes if instrucoes else 'Nenhuma'}"
-    print(resultado)
+    print(f"✅ Fim do tratamento: Status {status}")
     log_tratamento(
         "log_cpu_integridade",
         {
@@ -195,11 +269,15 @@ def verificar_integridade_disco(drive="C:"):
             "problems": problemas,
             "instructions": instrucoes
         },
-        texto=resultado
+        texto=f"Status: {status} | Instruções: {instrucoes if instrucoes else 'Nenhuma'}"
     )
     atualizar_cache_tratamento("verificar_integridade_disco")
 
 def limpar_arquivos_temporarios():
+    """
+    Limpa arquivos temporários do sistema, respeitando intervalo de execução.
+    Registra quantidade removida e espaço liberado.
+    """
     if not pode_executar_tratamento("limpar_arquivos_temporarios"):
         print("⏳ limpar_arquivos_temporarios só pode ser executado uma vez a cada 7 dias.")
         return
@@ -220,19 +298,22 @@ def limpar_arquivos_temporarios():
             except Exception:
                 continue
 
-    resultado = f"Arquivos removidos: {arquivos_removidos} | Espaço liberado: {tamanho_liberado / (1024*1024):.2f} MB"
-    print(resultado)
+    print(f"✅ Fim do tratamento: {arquivos_removidos} arquivos removidos, {tamanho_liberado / (1024*1024):.2f} MB liberados")
     log_tratamento(
         "log_disco",
         {
             "files_removed": arquivos_removidos,
             "space_freed_mb": tamanho_liberado / (1024*1024)
         },
-        texto=resultado
+        texto=f"Arquivos removidos: {arquivos_removidos} | Espaço liberado: {tamanho_liberado / (1024*1024):.2f} MB"
     )
     atualizar_cache_tratamento("limpar_arquivos_temporarios")
 
 def registrar_top_processos_cpu(top_n=5):
+    """
+    Registra os processos que mais consomem CPU, respeitando intervalo de execução.
+    Exibe e registra os top processos por uso de CPU.
+    """
     if not pode_executar_tratamento("registrar_top_processos_cpu"):
         print("⏳ registrar_top_processos_cpu só pode ser executado a cada 30 minutos.")
         return
@@ -257,18 +338,17 @@ def registrar_top_processos_cpu(top_n=5):
 
     top_processos = sorted(processos, key=lambda p: p["cpu_percent"], reverse=True)[:top_n]
 
-    texto = "Top processos por uso de CPU (% padrão):\n"
+    print(f"✅ Fim do tratamento: Top {top_n} processos exibidos.")
+    print("Prévia dos top processos:")
     for p in top_processos:
-        texto += f"PID {p['pid']} | {p['name']} | {p['cpu_percent']:.1f}% CPU | Status: {p['status']}\n"
-
-    print(texto.strip())
+        print(f"PID {p['pid']} | {p['name']} | {p['cpu_percent']:.1f}% CPU | Status: {p['status']}")
     log_tratamento(
         "log_cpu_top",
         {
             "top_processos": top_processos
         },
-        texto=texto.strip()
+        texto="Top processos por uso de CPU (% padrão):\n" + "\n".join(
+            f"PID {p['pid']} | {p['name']} | {p['cpu_percent']:.1f}% CPU | Status: {p['status']}" for p in top_processos
+        )
     )
     atualizar_cache_tratamento("registrar_top_processos_cpu")
-
-#
